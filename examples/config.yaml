@@ -1,0 +1,62 @@
+
+
+## 格子数目
+M: 7
+N: 7
+## 窗口大小
+edge: 100
+
+
+## 陷阱
+TRAPS:
+  - !!python/object:traps.Trap
+  position:
+    [1, 2]
+  color:
+    [0,0,0]
+  size:
+    30
+  - !!python/object:traps.Trap
+  position:
+    [5, 3]
+  color:
+    [0,0,0]
+  size:
+    30
+  - !!python/object:traps.Trap
+  position:
+    [2, 4]
+  color:
+    [0,0,0]
+  size:
+    30
+
+## 死亡陷阱
+DEATHTRAPS:
+  - !!python/object:traps.DeathTrap
+  position:
+    [4, 4]
+  color:
+    [1,0,0]
+  size:
+    30
+
+  - !!python/object:traps.DeathTrap
+  position:
+    [3, 3]
+  color:
+    [1,0,0]
+  size:
+    30
+
+  - !!python/object:traps.DeathTrap
+  position:
+    [7, 1]
+  color:
+    [1,0,0]
+  size:
+    30
+
+
+## 金币
+GOLD: [3,1]
