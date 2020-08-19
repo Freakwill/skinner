@@ -4,16 +4,27 @@
 from gym.envs.classic_control import rendering
 
 class BaseObject(object):
+    props = ('name', 'coordinate', 'color', 'size', 'type')
+    default_name = ''
+    default_type = ''
+    default_coordinate = (0,0)
+    default_color = (0,0,0)
+    default_size = 10
 
     def __init__(self, name, coordinate, color, size):
         self.name = name
+        self.type = self.default_type
         self.coordinate = coordinate
         self.color = color
         self.size = size
 
 
     def __setstate__(self, state):
-        self.name, self.coordinate, self.color, self.size = state['name'], state['coordinate'], state['color'], state['size']
+        for k in self.props:
+            if k in state:
+                setattr(self, k, state[k])
+            else:
+                setattr(self, k, state.get(k, getattr(self, 'default_%s'%k)))
 
 
 class Object(BaseObject):
@@ -24,9 +35,13 @@ class Object(BaseObject):
         self.state = state
 
     def draw(self, viewer):
-        if self.state is None:
-            return None
-        shape = rendering.make_circle(self.size)
-        shape.add_attr(rendering.Transform(translation=self.coordinate))
-        shape.set_color(*self.color)
-        viewer.add_geom(shape)
+        self.shape = rendering.make_circle(self.size)
+        if hasattr(self, 'coordinate') and self.coordinate:
+            self.transform = rendering.Transform(translation=self.coordinate)
+        else:
+            self.transform = rendering.Transform()
+        self.shape.add_attr(self.transform)
+        self.shape.set_color(*self.color)
+        viewer.add_geom(self.shape)
+
+

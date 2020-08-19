@@ -1,62 +1,75 @@
 
 
-## 格子数目
+## number of grids
 M: 7
 N: 7
-## 窗口大小
-edge: 100
+## size of every grid
+edge: 80
 
 
-## 陷阱
-TRAPS:
-  - !!python/object:traps.Trap
-  position:
-    [1, 2]
-  color:
-    [0,0,0]
-  size:
-    30
-  - !!python/object:traps.Trap
-  position:
-    [5, 3]
-  color:
-    [0,0,0]
-  size:
-    30
-  - !!python/object:traps.Trap
-  position:
-    [2, 4]
-  color:
-    [0,0,0]
-  size:
-    30
+## traps, not terminal
+traps:
+  - !!python/object:objects.Trap
+    position: !!python/tuple
+      [1, 2]
+    color: [0,1,0]
+    size: 30
+  - !!python/object:objects.Trap
+    position: !!python/tuple
+      [5, 3]
+    color: [0,1,0]
+    size: 30
+  - !!python/object:objects.Trap
+    position: [2, 4]
+    color: [0,1,0]
+    size: 30
 
-## 死亡陷阱
-DEATHTRAPS:
-  - !!python/object:traps.DeathTrap
-  position:
-    [4, 4]
-  color:
-    [1,0,0]
-  size:
-    30
+## deathtraps, terminal
+deathtraps:
+  - !!python/object:objects.DeathTrap
+    position:  !!python/tuple
+      [4, 4]
+    color: [1,0,0]
+    size: 30
 
-  - !!python/object:traps.DeathTrap
-  position:
-    [3, 3]
-  color:
-    [1,0,0]
-  size:
-    30
+  - !!python/object:objects.DeathTrap
+    position:  !!python/tuple
+      [3, 3]
+    color: [1,0,0]
+    size: 30
 
-  - !!python/object:traps.DeathTrap
-  position:
-    [7, 1]
-  color:
-    [1,0,0]
-  size:
-    30
+  - !!python/object:objects.DeathTrap
+    position: !!python/tuple
+      [7, 1]
+    color: [1,0,0]
+    size: 30
 
 
-## 金币
-GOLD: [3,1]
+## gold, terminal
+gold: !!python/object:objects.Gold
+  name: 'gold'
+  position: !!python/tuple
+    [3, 1]
+  color: [1,1,0]
+  size: 30
+
+## wall, not terminal
+walls: 
+  - !!python/object:objects.Wall
+    name: 'wall'
+    position: !!python/tuple
+      [1, 6]
+    color: [0,0,0]
+    size: 40
+  - !!python/object:objects.Wall
+    name: 'wall'
+    position: !!python/tuple
+      [2, 6]
+    color: [0,0,0]
+    size: 40
+  - !!python/object:objects.Wall
+    name: 'wall'
+    position: !!python/tuple
+      [3, 6]
+    color: [0,0,0]
+    size: 40

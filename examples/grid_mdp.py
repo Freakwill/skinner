@@ -15,11 +15,21 @@ next_state: 转态迁移 s'=f(s,a)
 from skinner import *
 from gym.envs.classic_control import rendering
 
-from config import *
 from objects import *
 
-screen_width = edge*(M+2)
-screen_height = edge*(N+2)
+import yaml
+with open('config.yaml') as fo:
+    s = fo.read()
+conf = yaml.unsafe_load(s)
+globals().update(conf)
+
+screen_width = edge * (M+2)
+screen_height = edge * (N+2)
+
+TRAPS = [trap.position for trap in traps]
+DEATHTRAPS = [trap.position for trap in deathtraps]
+GOLD = gold.position
+WALLS = [wall.position for wall in walls]
 
 class GridWorld(SingleAgentEnv):
     """Grid world 格子世界
@@ -39,10 +49,6 @@ class GridWorld(SingleAgentEnv):
         'video.frames_per_second': 2
     }
 
-    def __init__(self, agent):
-        super(GridWorld, self).__init__(agent)
-        self.terminate_states = DEATHTRAPS | {GOLD}
-
 
     def _get_reward(self, state, action, next_state):
         """回报函数
@@ -61,32 +67,33 @@ class GridWorld(SingleAgentEnv):
             return -1
         elif next_state in DEATHTRAPS:
             return -2
-        elif next_state in {GOLD}:
+        elif next_state == GOLD:
             return 3
         elif state == next_state:
             return -0.2
         else:
-            return -0.1
+            return -0.05
 
     def is_terminal(self):
-        return self.state in self.terminate_states
+        return self.state in DEATHTRAPS or self.state == GOLD
 
     def is_successful(self):
         return self.state == GOLD
 
     def reset(self):
         self.agent.reset()
-        self.agent.state = 1, N
 
     def post_process(self):
         if self.is_successful():
             self.history['n_steps'].append(self.agent.n_steps)
         else:
             self.history['n_steps'].append(self.max_steps)
+        self.history['reward'].append(self.agent.total_reward)
         self.agent.post_process()
 
     def pre_process(self):
         self.history['n_steps'] = []
+        self.history['reward'] = []
 
     def end_process(self):
         import pandas as pd
@@ -116,26 +123,26 @@ class GridWorld(SingleAgentEnv):
             self.viewer = rendering.Viewer(screen_width, screen_height)
             self.draw_background()
             # traps
-            for trap_pos in TRAPS:
-                trap = Trap(name='trap', state=True, position=trap_pos, color=(0,0,0), size=30)
+            for trap in traps:
                 trap.draw(self.viewer)
             # deathtraps
-            for trap_pos in DEATHTRAPS:
-                trap = DeathTrap(name='death trap', state=True, position=trap_pos, color=(1,0,0), size=30)
+            for trap in deathtraps:
                 trap.draw(self.viewer)
+            # deathtraps
+            for wall in walls:
+                wall.draw(self.viewer)
             # gold
-            gold = Gold(name='gold', state=True, position=GOLD, color=(1, 0.9, 0), size=30)
             gold.draw(self.viewer)
 
             # robot
-            self.robot= rendering.make_circle(30)
-            self.robotrans = rendering.Transform()
-            self.robot.add_attr(self.robotrans)
-            self.robot.set_color(0.8, 0.6, 0.4)
-            self.viewer.add_geom(self.robot)
+            self.agent.size = 30
+            self.agent.color = (0.8, 0.6, 0.4)
+            self.agent.coordinate = None
+            self.agent.draw(self.viewer)
 
         if self.state is None:
             return None
-        self.robotrans.set_translation(edge*self.state[0]+50, edge*self.state[1]+50)
+        self.agent.coordinate = edge*self.state[0]+50, edge*self.state[1]+50
+        self.agent.draw(self.viewer, flag=False)
 
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')

@@ -45,6 +45,7 @@ class BaseAgent(Object):
 
     def reset(self):
         self.n_steps = 0
+        self.total_reward = 0
 
 
 class StandardAgent(BaseAgent):
@@ -72,7 +73,9 @@ class StandardAgent(BaseAgent):
         return greedy(self.state, self.actions, self.Q, self.epsilon, default_action)
 
     def get_reward(self, env, action):
-        return self._get_reward(env, self.last_state, action, self.state)
+        r = self._get_reward(env, self.last_state, action, self.state)
+        self.total_reward += r
+        return r
 
     def step(self, env):
         action = self.select_action()
@@ -80,6 +83,7 @@ class StandardAgent(BaseAgent):
         reward = self.get_reward(env, action)
         self.update(action, reward)
         return reward
+
 
     def Q(self, key):
         return self.QTable.get(key, 0)
@@ -109,60 +113,66 @@ class StandardAgent(BaseAgent):
         elif self.VTable[state] < q:
             self.VTable[state] = q
 
-    def draw(self, viewer):
-        if viewer is None:
+    def draw(self, viewer, flag=True):
+        if flag:
             super(StandardAgent, self).draw(viewer)
         else:
-            self.transform.set_translation(**self.coordinate)
+            self.transform.set_translation(*self.coordinate)
 
     def post_process(self, *args, **kwargs):
-        self.epsilon = self.epsilon ** .99
-        self.alpha = self.alpha ** .99
+        self.epsilon **= .99
+        self.alpha **= .99
 
+import pandas as pd
 from sklearn.neural_network import *
 
 class NeuralAgent(StandardAgent):
 
-    def __init__(self, QTable, state=None, last_state=None, init_state=None):
-        self.QTable = {}
+    def __init__(self, state=None, last_state=None, init_state=None):
         self.state = state
         self.last_state = last_state
         self.init_state = init_state
-        self.mainQ = MLPRegressor(hidden_layer_sizes=(10,), max_iter=200)
+        self.mainQ = MLPRegressor(hidden_layer_sizes=(10,), max_iter=50, warm_start=True)
         self.targetQ = MLPRegressor(hidden_layer_sizes=(10,))
         self.epoch = 1
         self.gamma = 0.9
         self.alpha = 0.1
         self.epsilon = 0.2
-        self.cache = []
+        self.cache = pd.DataFrame(columns=('state', 'action', 'reward', 'state+'))
 
     def Q(self, key):
-        try:
-            key = (*key[0], self.actions.index(key[1]))
-            return self.mainQ.predict([key])[0]
-        except:
+        if not hasattr(self.mainQ, 'coefs_'):
             return 0
+        key = (*key[0], self.actions.index(key[1]))
+        return self.mainQ.predict([key])[0]
+
 
     def V(self, state):
         return max([self.Q(key=(state, a)) for a in self.actions])
 
     def update(self, action, reward):
-        # self.QTable[key] += self.alpha * (reward + self.gamma * self.V() - self.QTable.get(key, 0))
         action = self.actions.index(action)
-        self.cache.append((self.last_state, action, reward, self.state))
-        if len(self.cache)>200:
-            self.cache.pop(np.random.randint(200))
+        self.cache = self.cache.append({'state':self.last_state, 'action':action, 'reward':reward, 'state+':self.state}, ignore_index=True)
+        L = len(self.cache)
+        if L > 800:
+            self.cache.drop(np.arange(L-800+10))
+        if L > 10 and self.n_steps % 3 == 2:
+            self.learn()
+        if self.n_steps % 15 == 14:
+            self.updateQ()
 
-    def get_samples(self, size=30):
+    def get_samples(self, size=0.8):
         # state, action, reward, next_state ~ self.cache
         L = len(self.cache)
+        size = int(size * L)
         inds = np.random.choice(L, size=size)
-        states = np.array([state for state, _, _, _ in self.cache])[inds]
-        actions = np.array([action for _, action, _, _ in self.cache])[inds]
-        rewards = np.array([reward for _, _, reward, _ in self.cache])[inds]
-        next_states = np.array([next_state for _, _, _, next_state in self.cache])[inds]
+        states = self.cache.loc[inds, 'state'].values
+        states = np.array([state for state in states])
+        actions = self.cache.loc[inds, 'action']
+        rewards = self.cache.loc[inds, 'reward'].values
+        next_states = self.cache.loc[inds, 'state+'].values
         X = np.column_stack((states, actions))
-        y = rewards + self.gamma*np.array([self.V(s) for s in next_states])
+        y = rewards + self.gamma * np.array([self.V(s) for s in next_states])
         return X, y
 
 
@@ -171,5 +181,6 @@ class NeuralAgent(StandardAgent):
         self.mainQ.fit(X, y)
 
     def updateQ(self):
-        self.targetQ.set_params(**self.mainQ.get_params())
+        self.targetQ.coefs_ = self.mainQ.coefs_
+        self.targetQ.intercepts_ = self.mainQ.intercepts_
 

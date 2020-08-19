@@ -4,7 +4,6 @@
 
 import gym
 import numpy as np
-from config import *
 
 gym.register(
     id='GridWorld-v0',
@@ -16,7 +15,16 @@ gym.register(
 from gym.spaces import Discrete
 
 from skinner import *
-class MyAgent(NeuralAgent):
+
+import yaml
+with open('config.yaml') as fo:
+    s = fo.read()
+
+conf = yaml.unsafe_load(s)
+globals().update(conf)
+WALLS = [wall.position for wall in walls]
+
+class MyAgent(StandardAgent):
     action_index = Discrete(4)
     actions = ['n','e','s','w']
 
@@ -38,28 +46,31 @@ class MyAgent(NeuralAgent):
         Raises:
             Exception -- invalid action
         """
-
+        last_state = state
         if action=='e':
             if state[0]<=M-1:
                 state = (state[0]+1, state[1])
-            return state
         elif action=='w':
             if state[0]>=2:
                 state = (state[0]-1, state[1])
-            return state
         elif action=='s':
             if state[1]>=2:
                 state = (state[0], state[1]-1)
-            return state
         elif action=='n':
             if state[1]<=N-1:
                 state = (state[0], state[1]+1)
-            return state
         else:
             raise Exception('invalid action!')
+        if state in WALLS:
+            state = last_state
+        return state
 
     def _get_reward(self, env, last_state, action, state):
         return env._get_reward(last_state, action, state)
+
+    def reset(self):
+        super(MyAgent, self).reset()
+        self.state = 1, N
 
 agent = MyAgent({})
 
