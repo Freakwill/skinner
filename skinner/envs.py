@@ -6,8 +6,15 @@ import gym
 from gym.envs.classic_control import rendering
 
 class MyEnv(gym.Env):
+
+    metadata = {
+        'render.modes': ['human', 'rgb_array'],
+        'video.frames_per_second': 2
+    }
+
     history = {}
     max_steps = 150
+    
     def is_terminal(self):
         raise NotImplementedError
 
@@ -19,12 +26,11 @@ class MyEnv(gym.Env):
             return
 
         if self.viewer is None:  
-            self.viewer = rendering.Viewer(screen_width, screen_height)
+            self.create_viewer()
             # draw the backgroud of the env           
-            self.draw_backgroud()
+            self.draw_background()
             # draw the objects in env
-            for obj in self.objects:
-                obj.draw(self.viewer)
+            self.draw_objects()
 
         if self.state is None:
             return None
@@ -48,7 +54,7 @@ class MyEnv(gym.Env):
             self.render()
             self.epoch = i
             for k in range(self.max_steps):
-                time.sleep(0.01)
+                time.sleep(0.001)
                 self.step()
                 self.render()
                 done = self.is_terminal()
@@ -60,16 +66,18 @@ class MyEnv(gym.Env):
 
 
 class MultiAgentEnv(MyEnv):
-    def __init__(self, objects):
+    def __init__(self, objects={}):
         self.objects = objects
         self.viewer = None
         self.state = None
 
 class SingleAgentEnv(MyEnv):
     def __init__(self, agent):
-
         self.agent = agent
         self.viewer = None
+
+    def reset(self):
+        self.agent.reset()
 
     @property
     def state(self):
@@ -86,6 +94,7 @@ class SingleAgentEnv(MyEnv):
         is_terminal = self.is_terminal()
         if is_terminal:
             return
-        self.agent.step(self)
+        r = self.agent.step(self)
+        return self.agent, r, is_terminal, {}
 
     

@@ -31,7 +31,7 @@ DEATHTRAPS = [trap.position for trap in deathtraps]
 GOLD = gold.position
 WALLS = [wall.position for wall in walls]
 
-class GridWorld(SingleAgentEnv):
+class MyGridWorld(GridWorld, SingleAgentEnv):
     """Grid world 格子世界
     
     A robot playing the grid world, tries to find the golden (yellow circle), meanwhile
@@ -45,7 +45,12 @@ class GridWorld(SingleAgentEnv):
         metadata {dict} -- configuration of rendering
     """
 
-    def _get_reward(self, state, action, next_state):
+    M = conf['M']
+    N = conf['N']
+    edge = conf['edge']
+
+
+    def _get_reward(self, state, action, next_state, env=None):
         """回报函数
         
         被step方法调用
@@ -75,9 +80,6 @@ class GridWorld(SingleAgentEnv):
     def is_successful(self):
         return self.state == GOLD
 
-    def reset(self):
-        self.agent.reset()
-
     def post_process(self):
         if self.is_successful():
             self.history['n_steps'].append(self.agent.n_steps)
@@ -95,49 +97,24 @@ class GridWorld(SingleAgentEnv):
         data = pd.DataFrame(self.history)
         data.to_csv('history.csv')
 
-    def draw_background(self):
-        # grid world           
-        for k in range(M+1):
-            line = rendering.Line(((1+k)*edge, edge), ((1+k)*edge, (N+1)*edge))
-            line.set_color(0,0,0)
-            self.viewer.add_geom(line)
-        for k in range(N+1):
-            line = rendering.Line((edge, (1+k)*edge), ((M+1)*edge, (1+k)*edge))
-            line.set_color(0,0,0)
-            self.viewer.add_geom(line)
+    def draw_objects(self):
+        for trap in traps:
+            trap.draw(self.viewer)
+        # deathtraps
+        for trap in deathtraps:
+            trap.draw(self.viewer)
+        # deathtraps
+        for wall in walls:
+            wall.draw(self.viewer)
+        # gold
+        gold.draw(self.viewer)
+
+        # robot
+        self.agent.draw(self.viewer)
 
 
     def render(self, mode='human', close=False):
-        if close:
-            if self.viewer is not None:
-                self.viewer.close()
-                self.viewer = None
-            return
-
-        if self.viewer is None:
-            self.viewer = rendering.Viewer(screen_width, screen_height)
-            self.draw_background()
-            # traps
-            for trap in traps:
-                trap.draw(self.viewer)
-            # deathtraps
-            for trap in deathtraps:
-                trap.draw(self.viewer)
-            # deathtraps
-            for wall in walls:
-                wall.draw(self.viewer)
-            # gold
-            gold.draw(self.viewer)
-
-            # robot
-            self.agent.size = 30
-            self.agent.color = (0.8, 0.6, 0.4)
-            self.agent.coordinate = None
-            self.agent.draw(self.viewer)
-
-        if self.state is None:
-            return None
-        self.agent.coordinate = edge*self.state[0]+50, edge*self.state[1]+50
+        super(MyGridWorld, self).render(mode, close)
+        self.agent.position = self.agent.state
         self.agent.draw(self.viewer, flag=False)
-
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')

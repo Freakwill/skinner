@@ -12,15 +12,21 @@ class BaseAgent(Object):
     init_state: init state'''
     env = None
     n_steps = 0
+    total_reward = 0
 
-    def next_state(self, action):
+    def next_state(self, action, env=None):
         """
         self.__next_state: state transition method
         function: state, action -> state
         """
         self.n_steps +=1
         self.last_state = self.state
-        self.state = self._next_state(self.last_state, action)
+        self.state = self._next_state(self.last_state, action, env)
+
+    def get_reward(self, action, env=None):
+        r = self._get_reward(self.last_state, action, self.state, env)
+        self.total_reward += r
+        return r
 
     def Q(self, key):
         raise NotImplementedError
@@ -72,15 +78,11 @@ class StandardAgent(BaseAgent):
             default_action=choice(self.actions)
         return greedy(self.state, self.actions, self.Q, self.epsilon, default_action)
 
-    def get_reward(self, env, action):
-        r = self._get_reward(env, self.last_state, action, self.state)
-        self.total_reward += r
-        return r
 
-    def step(self, env):
+    def step(self, env=None):
         action = self.select_action()
         self.next_state(action)
-        reward = self.get_reward(env, action)
+        reward = self.get_reward(action, env)
         self.update(action, reward)
         return reward
 

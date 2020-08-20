@@ -4,20 +4,22 @@
 from skinner import *
 
 edge = 80
-def _coordinate(position):
-    return position[0]*edge+edge//2, position[1]*edge+edge//2
+def _coordinate(position, offset=0.5):
+    return (position[0]-offset)*edge+edge//2, (position[1]-offset)*edge+edge//2
 
 
 class _Object(Object):
     props = ('name', 'position', 'color', 'size')
+    default_position=(0,0)
 
-    def __init__(self, name='', state=None, position=(1,1), color=(0,0,0), size=30):
-        self.position = position
-        super(_Object, self).__init__(state, name, coordinate=_coordinate(position), color=color, size=size)
+    # def __init__(self, name='', state=None, position=(1,1), color=(0,0,0), size=30):
+    #     self.position = position
+    #     super(_Object, self).__init__(state, name, coordinate=None, color=color, size=size)
 
-    def __setstate__(self, state):
-        super(_Object, self).__setstate__(state)
-        self.coordinate=_coordinate(self.position)
+    @property
+    def coordinate(self):
+        return _coordinate(self.position)
+    
 
 
 class Trap(_Object):
@@ -40,3 +42,5 @@ class Wall(_Object):
     '''[Summary for Class Trap]'''
     pass
         
+class Robot(_Object, StandardAgent):
+    pass

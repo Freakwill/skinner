@@ -6,8 +6,8 @@ import gym
 import numpy as np
 
 gym.register(
-    id='GridWorld-v0',
-    entry_point='grid_mdp:GridWorld',
+    id='GridWorld-v1',
+    entry_point='simple_grid:MyGridWorld',
     max_episode_steps=200,
     reward_threshold=100.0
     )
@@ -15,6 +15,7 @@ gym.register(
 from gym.spaces import Discrete
 
 from skinner import *
+from objects import Robot
 
 import yaml
 with open('config.yaml') as fo:
@@ -24,14 +25,18 @@ conf = yaml.unsafe_load(s)
 globals().update(conf)
 WALLS = [wall.position for wall in walls]
 
-class MyAgent(StandardAgent):
+
+class MyRobot(Robot):
     action_index = Discrete(4)
     actions = ['n','e','s','w']
 
     alpha = 0.3
     gamma = 0.9
 
-    def _next_state(self, state, action):
+    size = 30
+    color = (0.8, 0.6, 0.4)
+
+    def _next_state(self, state, action, env=None):
         """状态迁移方法
         
         这是一个确定性迁移
@@ -65,16 +70,21 @@ class MyAgent(StandardAgent):
             state = last_state
         return state
 
-    def _get_reward(self, env, last_state, action, state):
+    def _get_reward(self, last_state, action, state, env=None):
         return env._get_reward(last_state, action, state)
 
     def reset(self):
-        super(MyAgent, self).reset()
+        super(MyRobot, self).reset()
         self.state = 1, N
 
-agent = MyAgent({})
+    # @property
+    # def coordinate(self):
+    #     return _coordinate(self.position)
+
+agent = MyRobot({})
+
 
 if __name__ == '__main__':
-    env = gym.make('GridWorld-v0', agent=agent)
+    env = gym.make('GridWorld-v1', agent=agent)
     env.seed()
     env.demo()

@@ -4,15 +4,17 @@
 from collections.abc import Iterable
 from gym.spaces import Discrete
 
+
 class FiniteSet(Discrete):
     r"""A discrete space in :math:`\{ a,b,c ... \}`. 
     Example::
-        >>> FiniteSet('news')
+        >>> space = FiniteSet('news')
+        >>> space.sample()
     """
     def __init__(self, actions):
         assert isinstance(actions, Iterable)
         self.actions = tuple(actions)
-        super(FiniteSet, self).__init__(n, np.int64)
+        super(FiniteSet, self).__init__(len(actions))
 
     def sample(self):
         return self.np_random.choice(self.actions)
@@ -31,3 +33,4 @@ class FiniteSet(Discrete):
 
     def __eq__(self, other):
         return isinstance(other, FiniteSet) and self.n == other.n
+

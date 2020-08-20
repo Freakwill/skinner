@@ -11,12 +11,12 @@ class BaseObject(object):
     default_color = (0,0,0)
     default_size = 10
 
-    def __init__(self, name, coordinate, color, size):
-        self.name = name
-        self.type = self.default_type
-        self.coordinate = coordinate
-        self.color = color
-        self.size = size
+    def __init__(self, *args, **kwargs):
+        for k in self.props:
+            if k in kwargs:
+                setattr(self, k, kwargs[k])
+            else:
+                setattr(self, k, getattr(self, 'default_%s'%k))
 
 
     def __setstate__(self, state):
@@ -24,7 +24,7 @@ class BaseObject(object):
             if k in state:
                 setattr(self, k, state[k])
             else:
-                setattr(self, k, state.get(k, getattr(self, 'default_%s'%k)))
+                setattr(self, k, getattr(self, 'default_%s'%k))
 
 
 class Object(BaseObject):
