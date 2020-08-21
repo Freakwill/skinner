@@ -1,12 +1,27 @@
+# Grid Maze: 
+# n_cols * n_rows: size of the maze, the number of squares
+# edge: the length of the edge of each square
+# walls: the positions of walls as the components of the environment
 
 
 ## number of grids
-M: 7
-N: 7
+n_cols: 7
+n_rows: 7
 ## size of every grid
 edge: 80
 
 
+## positions of walls
+walls: !!set
+  {!!python/tuple [1, 6],
+  !!python/tuple [2, 6],
+  !!python/tuple [3, 6],
+  !!python/tuple [4, 6],
+  !!python/tuple [5, 4],
+  !!python/tuple [6, 3],}
+
+
+## objects in environment (excluding the agent)
 ## traps, not terminal
 traps:
   - !!python/object:objects.Trap
@@ -50,38 +65,6 @@ gold: !!python/object:objects.Gold
   name: 'gold'
   position: !!python/tuple
     [3, 1]
-  color: [1,1,0]
+  color: [1,0.8,0]
   size: 30
 
-## wall, not terminal
-walls: 
-  - !!python/object:objects.Wall
-    name: 'wall'
-    position: !!python/tuple
-      [1, 6]
-    color: [0,0,0]
-    size: 40
-  - !!python/object:objects.Wall
-    name: 'wall'
-    position: !!python/tuple
-      [2, 6]
-    color: [0,0,0]
-    size: 40
-  - !!python/object:objects.Wall
-    name: 'wall'
-    position: !!python/tuple
-      [3, 6]
-    color: [0,0,0]
-    size: 40
-  - !!python/object:objects.Wall
-    name: 'wall'
-    position: !!python/tuple
-      [5, 4]
-    color: [0,0,0]
-    size: 40
-  - !!python/object:objects.Wall
-    name: 'wall'
-    position: !!python/tuple
-      [6, 3]
-    color: [0,0,0]
-    size: 40
