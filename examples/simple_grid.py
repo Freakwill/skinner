@@ -23,8 +23,8 @@ with open('config.yaml') as fo:
 conf = yaml.unsafe_load(s)
 globals().update(conf)
 
-screen_width = edge * (M+2)
-screen_height = edge * (N+2)
+screen_width = edge * (n_cols+2)
+screen_height = edge * (n_rows+2)
 
 TRAPS = [trap.position for trap in traps]
 DEATHTRAPS = [trap.position for trap in deathtraps]
@@ -45,31 +45,33 @@ class MyGridWorld(GridWorld, SingleAgentEnv):
         metadata {dict} -- configuration of rendering
     """
 
-    M = conf['M']
-    N = conf['N']
+    n_cols = conf['n_cols']
+    n_rows = conf['n_rows']
     edge = conf['edge']
 
+    walls = conf['walls']
 
-    def _get_reward(self, state, action, next_state, env=None):
+
+    def _get_reward(self, state0, action, state1):
         """回报函数
         
         被step方法调用
         
         Arguments:
-            state -- 动作之前的状态
+            state0 -- 动作之前的状态
             action -- 动作
-            next_state -- 动作之后的状态
+            state1 -- 动作之后的状态
         
         Returns:
             number -- 回报值
         """
-        if next_state in TRAPS:
+        if state1 in TRAPS:
             return -1
-        elif next_state in DEATHTRAPS:
+        elif state1 in DEATHTRAPS:
             return -2
-        elif next_state == GOLD:
+        elif state1 == GOLD:
             return 3
-        elif state == next_state:
+        elif state0 == state1:
             return -0.2
         else:
             return -0.05
@@ -104,7 +106,7 @@ class MyGridWorld(GridWorld, SingleAgentEnv):
         for trap in deathtraps:
             trap.draw(self.viewer)
         # deathtraps
-        for wall in walls:
+        for wall in self.walls:
             wall.draw(self.viewer)
         # gold
         gold.draw(self.viewer)

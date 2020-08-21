@@ -14,17 +14,17 @@ class BaseAgent(Object):
     n_steps = 0
     total_reward = 0
 
-    def next_state(self, action, env=None):
+    def next_state(self, action):
         """
         self.__next_state: state transition method
         function: state, action -> state
         """
         self.n_steps +=1
         self.last_state = self.state
-        self.state = self._next_state(self.last_state, action, env)
+        self.state = self._next_state(self.last_state, action)
 
-    def get_reward(self, action, env=None):
-        r = self._get_reward(self.last_state, action, self.state, env)
+    def get_reward(self, action):
+        r = self._get_reward(self.last_state, action, self.state)
         self.total_reward += r
         return r
 
@@ -49,9 +49,21 @@ class BaseAgent(Object):
     def learn(self):
         raise NotImplementedError
 
-    def reset(self):
+    def reset(self, env=None):
         self.n_steps = 0
         self.total_reward = 0
+
+    def _next_state(self, state, action):
+        """transition function
+        s, a -> s'
+        """
+        raise NotImplementedError
+
+    def _get_reward(state0, action, state1):
+        """reward function
+        s, a, s' -> r
+        """
+        raise NotImplementedError
 
 
 class StandardAgent(BaseAgent):
@@ -71,18 +83,18 @@ class StandardAgent(BaseAgent):
         self.epoch = 1
         self.gamma = 0.9
         self.alpha = 0.1
-        self.epsilon = 0.02
+        self.epsilon = 0.05
 
     def select_action(self, default_action=None):
         if default_action is None:
-            default_action=choice(self.actions)
+            default_action = self.actions.sample()
         return greedy(self.state, self.actions, self.Q, self.epsilon, default_action)
 
 
-    def step(self, env=None):
+    def step(self):
         action = self.select_action()
         self.next_state(action)
-        reward = self.get_reward(action, env)
+        reward = self.get_reward(action)
         self.update(action, reward)
         return reward
 
@@ -134,7 +146,7 @@ class NeuralAgent(StandardAgent):
         self.state = state
         self.last_state = last_state
         self.init_state = init_state
-        self.mainQ = MLPRegressor(hidden_layer_sizes=(10,), max_iter=50, warm_start=True)
+        self.mainQ = MLPRegressor(hidden_layer_sizes=(10,), max_iter=20, warm_start=True)
         self.targetQ = MLPRegressor(hidden_layer_sizes=(10,))
         self.epoch = 1
         self.gamma = 0.9
@@ -152,8 +164,12 @@ class NeuralAgent(StandardAgent):
     def V(self, state):
         return max([self.Q(key=(state, a)) for a in self.actions])
 
+    def targetV(self, state, env=None):
+        if env.is_terminal(state):
+            return 0
+        return max([self.targetQ(key=(state, a)) for a in self.actions])
+
     def update(self, action, reward):
-        action = self.actions.index(action)
         self.cache = self.cache.append({'state':self.last_state, 'action':action, 'reward':reward, 'state+':self.state}, ignore_index=True)
         L = len(self.cache)
         if L > 800:
@@ -174,7 +190,7 @@ class NeuralAgent(StandardAgent):
         rewards = self.cache.loc[inds, 'reward'].values
         next_states = self.cache.loc[inds, 'state+'].values
         X = np.column_stack((states, actions))
-        y = rewards + self.gamma * np.array([self.V(s) for s in next_states])
+        y = rewards + self.gamma * np.array([self.targetV(s, env) for s in next_states])
         return X, y
 
 

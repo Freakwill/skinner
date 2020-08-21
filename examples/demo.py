@@ -3,7 +3,6 @@
 
 
 import gym
-import numpy as np
 
 gym.register(
     id='GridWorld-v1',
@@ -17,18 +16,10 @@ from gym.spaces import Discrete
 from skinner import *
 from objects import Robot
 
-import yaml
-with open('config.yaml') as fo:
-    s = fo.read()
-
-conf = yaml.unsafe_load(s)
-globals().update(conf)
-WALLS = [wall.position for wall in walls]
-
 
 class MyRobot(Robot):
-    action_index = Discrete(4)
-    actions = ['n','e','s','w']
+    # actions = Discrete(4)
+    actions = FiniteSet('news')
 
     alpha = 0.3
     gamma = 0.9
@@ -36,14 +27,12 @@ class MyRobot(Robot):
     size = 30
     color = (0.8, 0.6, 0.4)
 
-    def _next_state(self, state, action, env=None):
-        """状态迁移方法
-        
-        这是一个确定性迁移
+    def _next_state(self, state, action):
+        """transition function
         
         Arguments:
-            state
-            action
+            state -- state before action
+            action -- the action selected by the agent
         
         Returns:
             new state
@@ -53,7 +42,7 @@ class MyRobot(Robot):
         """
         last_state = state
         if action=='e':
-            if state[0]<=M-1:
+            if state[0]<=self.env.n_rows-1:
                 state = (state[0]+1, state[1])
         elif action=='w':
             if state[0]>=2:
@@ -62,26 +51,52 @@ class MyRobot(Robot):
             if state[1]>=2:
                 state = (state[0], state[1]-1)
         elif action=='n':
-            if state[1]<=N-1:
+            if state[1]<=self.env.n_cols-1:
                 state = (state[0], state[1]+1)
         else:
             raise Exception('invalid action!')
-        if state in WALLS:
+        if self.collide(state):
             state = last_state
         return state
 
-    def _get_reward(self, last_state, action, state, env=None):
-        return env._get_reward(last_state, action, state)
+    def collide(self, state):
+        for wall in self.env.walls:
+            if wall.position == state:
+                return True
+        else:
+            return False
+
+
+    def _get_reward(self, state0, action, state1):
+        """reward function
+        
+        called in step method
+        
+        Arguments:
+            state0 -- state before action
+            action -- the action
+            state1 -- state after action
+        
+        Returns:
+            number -- reward
+        """
+        if state1 in self.env.TRAPS:
+            return -1
+        elif state1 in self.env.DEATHTRAPS:
+            return -2
+        elif state1 == self.env.GOLD:
+            return 3
+        elif state0 == state1:
+            return -0.2
+        else:
+            return -0.05
 
     def reset(self):
         super(MyRobot, self).reset()
-        self.state = 1, N
+        self.state = 1, self.env.n_rows
 
-    # @property
-    # def coordinate(self):
-    #     return _coordinate(self.position)
 
-agent = MyRobot({})
+agent = MyRobot()
 
 
 if __name__ == '__main__':

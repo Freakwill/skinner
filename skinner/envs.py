@@ -5,7 +5,7 @@
 import gym
 from gym.envs.classic_control import rendering
 
-class MyEnv(gym.Env):
+class BaseEnv(gym.Env):
 
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -14,6 +14,19 @@ class MyEnv(gym.Env):
 
     history = {}
     max_steps = 150
+
+    __objects = set()
+    viewer = None
+
+    @property
+    def objects(self):
+        return self.__objects
+
+    def add_objects(self, objs):
+        self.__objects |= objs
+        for obj in objs:
+            obj.env = self
+    
     
     def is_terminal(self):
         raise NotImplementedError
@@ -64,17 +77,24 @@ class MyEnv(gym.Env):
         self.end_process()
         self.close()
 
+    def draw_objects(self):
+        for obj in self.objects:
+            obj.draw(self)
 
-class MultiAgentEnv(MyEnv):
-    def __init__(self, objects={}):
-        self.objects = objects
+    def reset(self):
+        for obj in self.objects:
+            obj.draw(self)
+
+class MultiAgentEnv(BaseEnv):
+    def __init__(self, objects=[]):
+        self.add_objects(objects)
         self.viewer = None
         self.state = None
 
-class SingleAgentEnv(MyEnv):
+class SingleAgentEnv(BaseEnv):
     def __init__(self, agent):
         self.agent = agent
-        self.viewer = None
+        self.add_objects({agent})
 
     def reset(self):
         self.agent.reset()
@@ -94,7 +114,7 @@ class SingleAgentEnv(MyEnv):
         is_terminal = self.is_terminal()
         if is_terminal:
             return
-        r = self.agent.step(self)
+        r = self.agent.step()
         return self.agent, r, is_terminal, {}
 
     
