@@ -17,7 +17,7 @@ from objects import Robot
 
 class MyRobot(Robot):
     # actions = Discrete(4)
-    actions = FiniteSet('news')
+    action_space = FiniteSet('news')
 
     alpha = 0.3
     gamma = 0.9

@@ -87,8 +87,8 @@ class StandardAgent(BaseAgent):
 
     def select_action(self, default_action=None):
         if default_action is None:
-            default_action = self.actions.sample()
-        return greedy(self.state, self.actions, self.Q, self.epsilon, default_action)
+            default_action = self.action_space.sample()
+        return greedy(self.state, self.action_space, self.Q, self.epsilon, default_action)
 
 
     def step(self):
@@ -108,7 +108,7 @@ class StandardAgent(BaseAgent):
         if state in self.VTable:
             return self.VTable[state]
         else:
-            return max([self.Q(key=(state, a))for a in self.actions])
+            return max([self.Q(key=(state, a))for a in self.action_space])
 
     def visited(self, key):
         return key in self.QTable
@@ -174,17 +174,17 @@ class NeuralAgent(StandardAgent):
     def Q(self, key):
         if not hasattr(self.mainQ, 'coefs_'):
             return 0
-        key = (*key[0], self.actions.index(key[1]))
+        key = (*key[0], self.action_space.index(key[1]))
         return self.mainQ.predict([key])[0]
 
 
     def V(self, state):
-        return max([self.Q(key=(state, a)) for a in self.actions])
+        return max([self.Q(key=(state, a)) for a in self.action_space])
 
     def targetV(self, state, env=None):
         if env.is_terminal(state):
             return 0
-        return max([self.targetQ(key=(state, a)) for a in self.actions])
+        return max([self.targetQ(key=(state, a)) for a in self.action_space])
 
     def update(self, action, reward):
         self.cache = self.cache.append({'state':self.last_state, 'action':action, 'reward':reward, 'state+':self.state}, ignore_index=True)
