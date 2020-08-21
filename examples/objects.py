@@ -38,9 +38,11 @@ class Gold(_Object):
         gold_hole = _Object(name='gold_hole', state=True, position=self.position, color=(1, 1, 1), size=15)
         gold_hole.draw(viewer)
 
-class Wall(_Object):
-    '''[Summary for Class Trap]'''
-    pass
-        
+
+
 class Robot(_Object, StandardAgent):
     pass
+    # def create_shape(self):
+    #     from gym.envs.classic_control import rendering
+    #     self.shape = rendering.Image('robot.jpeg', width=30, height=30)
+

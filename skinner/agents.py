@@ -137,6 +137,23 @@ class StandardAgent(BaseAgent):
         self.epsilon **= .99
         self.alpha **= .99
 
+class NonStandardAgent(StandardAgent):
+    def update(self, action, reward):
+        key = self.last_state, action
+        state = self.last_state
+        if key not in self.QTable:
+            self.QTable[key] = self.predict(key)
+        self.QTable[key] += self.alpha * (reward + self.gamma * self.V() - self.QTable[key])
+        q = self.QTable[key]
+        if state not in self.VTable:
+            self.VTable[state] = self.V(state)
+        elif self.VTable[state] < q:
+            self.VTable[state] = q
+
+    def predict(self):
+        pass
+
+
 import pandas as pd
 from sklearn.neural_network import *
 

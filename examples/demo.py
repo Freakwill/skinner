@@ -11,9 +11,7 @@ gym.register(
     reward_threshold=100.0
     )
 
-from gym.spaces import Discrete
-
-from skinner import *
+from skinner import FiniteSet
 from objects import Robot
 
 
@@ -61,7 +59,7 @@ class MyRobot(Robot):
 
     def collide(self, state):
         for wall in self.env.walls:
-            if wall.position == state:
+            if wall == state:
                 return True
         else:
             return False

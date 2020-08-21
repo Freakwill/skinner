@@ -17,6 +17,7 @@ class BaseEnv(gym.Env):
 
     __objects = set()
     viewer = None
+    # __components = set()
 
     @property
     def objects(self):
@@ -91,10 +92,12 @@ class MultiAgentEnv(BaseEnv):
         self.viewer = None
         self.state = None
 
+
 class SingleAgentEnv(BaseEnv):
     def __init__(self, agent):
         self.agent = agent
-        self.add_objects({agent})
+        if agent:
+            self.add_objects({agent})
 
     def reset(self):
         self.agent.reset()
@@ -107,8 +110,8 @@ class SingleAgentEnv(BaseEnv):
     def last_state(self):
         return self.agent.last_state
 
-    def get_reward(self, action):
-        return self._get_reward(self.last_state, action, self.state)
+    # def get_reward(self, action):
+    #     return self._get_reward(self.last_state, action, self.state)
 
     def step(self):
         is_terminal = self.is_terminal()
