@@ -23,7 +23,7 @@ class MyRobot(Robot):
     gamma = 0.9
 
     size = 30
-    color = (0.8, 0.6, 0.4)
+    color = (0, 0.1, 1)
 
     def _next_state(self, state, action):
         """transition function
