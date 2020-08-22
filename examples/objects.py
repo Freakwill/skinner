@@ -39,10 +39,30 @@ class Gold(_Object):
         gold_hole.draw(viewer)
 
 
-
 class Robot(_Object, StandardAgent):
     pass
     # def create_shape(self):
     #     from gym.envs.classic_control import rendering
     #     self.shape = rendering.Image('robot.jpeg', width=30, height=30)
 
+class NeuralRobot(_Object, NeuralAgent):
+
+    @classmethod
+    def key2vector(cls, key):
+        return *key[0], *cls.action_space.onehot_encode(key[1])
+
+
+    def get_samples(self, size=0.8):
+        # state, action, reward, next_state ~ self.cache
+        L = len(self.cache)
+        size = int(size * L)
+        inds = np.random.choice(L, size=size)
+        states = self.cache.loc[inds, 'state'].values
+        states = np.array([state for state in states])
+        actions = self.cache.loc[inds, 'action'].values
+        actions = self.action_space.onehot_encode(actions)
+        rewards = self.cache.loc[inds, 'reward'].values
+        next_states = self.cache.loc[inds, 'state+'].values
+        X = np.column_stack((states, actions))
+        y = rewards + self.gamma * np.array([self.V_(s) for s in next_states])
+        return X, y

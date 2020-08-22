@@ -13,7 +13,7 @@ class BaseEnv(gym.Env):
     }
 
     history = {}
-    max_steps = 150
+    max_steps = 200
 
     __objects = set()
     viewer = None
@@ -59,7 +59,7 @@ class BaseEnv(gym.Env):
     def end_process(self, *args, **kwargs):
         pass
 
-    def demo(self, n_epochs=100, history=None):
+    def demo(self, n_epochs=200, history=None):
         import time
         # demo of RL
         self.pre_process()

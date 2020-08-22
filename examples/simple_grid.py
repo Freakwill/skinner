@@ -68,3 +68,20 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
         # robot
         self.agent.draw(self.viewer)
 
+    def post_process(self):
+        if self.is_successful():
+            self.history['n_steps'].append(self.agent.n_steps)
+        else:
+            self.history['n_steps'].append(self.max_steps)
+        self.history['reward'].append(self.agent.total_reward)
+        self.agent.post_process()
+
+    def pre_process(self):
+        self.history['n_steps'] = []
+        self.history['reward'] = []
+
+    def end_process(self):
+        import pandas as pd
+        data = pd.DataFrame(self.history)
+        data.to_csv('history.csv')
+

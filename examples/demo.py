@@ -12,15 +12,16 @@ gym.register(
     )
 
 from skinner import FiniteSet
-from objects import Robot
+from objects import Robot, NeuralRobot
 
 
 class MyRobot(Robot):
-    # actions = Discrete(4)
+    # action_space = Discrete(4)
     action_space = FiniteSet('news')
 
-    alpha = 0.3
-    gamma = 0.9
+    alpha = 0.2
+    gamma = 0.8
+    epsilon = 0.1
 
     size = 30
     color = (0, 0.1, 1)
@@ -81,7 +82,7 @@ class MyRobot(Robot):
         if state1 in self.env.TRAPS:
             return -1
         elif state1 in self.env.DEATHTRAPS:
-            return -2
+            return -3
         elif state1 == self.env.GOLD:
             return 3
         elif state0 == state1:

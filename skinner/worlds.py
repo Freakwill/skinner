@@ -4,7 +4,7 @@
 from .envs import *
 from .objects import Object
 
-class GridWorld(SingleAgentEnv):
+class GridWorld(BaseEnv):
     """Grid world
     
     Extends:
@@ -45,22 +45,6 @@ class GridWorld(SingleAgentEnv):
         self.agent.draw(self.viewer, flag=False)
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
-    def post_process(self):
-        if self.is_successful():
-            self.history['n_steps'].append(self.agent.n_steps)
-        else:
-            self.history['n_steps'].append(self.max_steps)
-        self.history['reward'].append(self.agent.total_reward)
-        self.agent.post_process()
-
-    def pre_process(self):
-        self.history['n_steps'] = []
-        self.history['reward'] = []
-
-    def end_process(self):
-        import pandas as pd
-        data = pd.DataFrame(self.history)
-        data.to_csv('history.csv')
 
 def _coordinate(position, edge=10, offset=0.5):
     return (position[0]+0.5-offset)*edge, (position[1]+0.5-offset)*edge
