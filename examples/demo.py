@@ -19,14 +19,14 @@ class MyRobot(Robot):
     # action_space = Discrete(4)
     action_space = FiniteSet('news')
 
-    alpha = 0.3
+    alpha = 0.5
     gamma = 0.8
-    epsilon = 0.2
+    epsilon = 0.1
 
     size = 30
     color = (0, 0.1, 1)
 
-    init_power = 16
+    init_power = 20
 
     @property
     def power(self):
@@ -66,7 +66,6 @@ class MyRobot(Robot):
                 next_state = *next_state[:2], 50
             else:
                 next_state = *next_state[:2], next_state[2]-1
-        print(next_state)
         return next_state
 
 
@@ -85,24 +84,24 @@ class MyRobot(Robot):
         """
         
         r = 0
-        if state0[-1] <=5:
-            if state1 == self.env.CHARGER:
-                r += .1
+        if state0[-1] <=4:
+            if state1[:2] == self.env.CHARGER:
+                r += .2
             else:
-                r -= .1
+                r -= .2
         else:
-            if state1 == self.env.CHARGER:
+            if state1[:2] == self.env.CHARGER:
                 r -= .1
-        if state1 in self.env.TRAPS:
-            r -= 1
-        elif state1 in self.env.DEATHTRAPS:
-            r -= 3
-        elif state1 == self.env.GOLD:
-            r += 3
-        elif state0 == state1:
+        if state1[:2] in self.env.TRAPS:
+            r -= 10
+        elif state1[:2] in self.env.DEATHTRAPS:
+            r -= 20
+        elif state1[:2] == self.env.GOLD:
+            r += 10
+        elif state0[:2] == state1[:2]:
             r -= 0.2
         else:
-            r -= 0.05
+            r -= 0.1
         return r
 
     def reset(self):
@@ -116,4 +115,4 @@ agent = MyRobot()
 if __name__ == '__main__':
     env = gym.make('GridWorld-v1', agent=agent)
     env.seed()
-    env.demo(n_epochs=500)
+    env.demo(n_epochs=2000)

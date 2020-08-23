@@ -113,14 +113,13 @@ class StandardAgent(BaseAgent):
     def visited(self, key):
         return key in self.QTable
 
+
     def update(self, action, reward):
         key = self.last_state, action
         state = self.last_state
-        if key in self.QTable:
-            self.QTable[key] += self.alpha * (reward + self.gamma * self.V() - self.QTable[key])
-        else:
-            # resume self.QTable[key] == 0
-            self.QTable[key] = self.alpha * reward + self.gamma * self.V()
+        if key not in self.QTable:
+            self.QTable[key] = self.predict(key)
+        self.QTable[key] += self.alpha * (reward + self.gamma * self.V() - self.QTable[key])
         q = self.QTable[key]
         if state not in self.VTable:
             self.VTable[state] = self.V(state)
@@ -134,24 +133,20 @@ class StandardAgent(BaseAgent):
             self.transform.set_translation(*self.coordinate)
 
     def post_process(self, *args, **kwargs):
-        self.epsilon **= .995
-        self.alpha **= .995
+        self.epsilon **= .999
+        self.alpha **= .999
+
+    def predict(self, key):
+        return 0
+
+from scipy.spatial.distance import hamming
 
 class NonStandardAgent(StandardAgent):
-    def update(self, action, reward):
-        key = self.last_state, action
-        state = self.last_state
-        if key not in self.QTable:
-            self.QTable[key] = self.predict(key)
-        self.QTable[key] += self.alpha * (reward + self.gamma * self.V() - self.QTable[key])
-        q = self.QTable[key]
-        if state not in self.VTable:
-            self.VTable[state] = self.V(state)
-        elif self.VTable[state] < q:
-            self.VTable[state] = q
 
-    def predict(self):
-        pass
+    def predict(self, key):
+        k_v = self.QTable.items()
+        i = np.argmin([hamming(k, key) for k, v in k_v])
+        return list(k_v)[i][1]
 
 
 import pandas as pd
@@ -208,7 +203,7 @@ class MLAgent(StandardAgent):
         if L > 800:
             self.cache.drop(np.arange(L-800+10))
         if L > 200:
-            if self.n_steps % 4 == 3:
+            if self.n_steps % 2 == 1:
                 self.learn()
             if self.n_steps % 20 == 19:
                 self.updateQ()
@@ -238,7 +233,7 @@ class MLAgent(StandardAgent):
 class NeuralAgent(MLAgent):
     def __init__(self, *args, **kwargs):
         super(NeuralAgent, self).__init__(*args, **kwargs)
-        self.mainQ = MLPRegressor(hidden_layer_sizes=(20,), max_iter=300, warm_start=True, learning_rate='adaptive')
+        self.mainQ = MLPRegressor(hidden_layer_sizes=(20,), max_iter=10, warm_start=True, learning_rate='adaptive')
         self.targetQ = MLPRegressor(max_iter=1)
 
     def updateQ(self):

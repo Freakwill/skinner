@@ -38,8 +38,6 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
     n_rows = conf['n_rows']
     edge = conf['edge']
 
-    CHARGER = charger.position
-
     TRAPS = [trap.position for trap in traps]
     DEATHTRAPS = [trap.position for trap in deathtraps]
     GOLD = gold.position
@@ -47,10 +45,10 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
     def __init__(self, *args, **kwargs):
         super(MyGridWorld, self).__init__(*args, **kwargs)
         self.add_walls(conf['walls'])
-        self.add_objects((*traps, *deathtraps, charger, gold))
+        self.add_objects((*traps, *deathtraps, gold))
 
     def is_terminal(self):
-        return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD or self.agent.power<=0
+        return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD
 
     def is_successful(self):
         return self.agent.position == self.GOLD

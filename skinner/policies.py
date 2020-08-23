@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from random import choice, random
+from random import random
 import numpy as np
 
 def greedy(state, actions, Q, epsilon=0.02, default_action=None):

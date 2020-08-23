@@ -6,13 +6,13 @@ import gym
 
 gym.register(
     id='GridWorld-v1',
-    entry_point='simple_grid:MyGridWorld',
+    entry_point='simple_grid1:MyGridWorld',
     max_episode_steps=200,
     reward_threshold=100.0
     )
 
 from skinner import FiniteSet
-from objects import Robot, NeuralRobot
+from objects import Robot
 
 
 class MyRobot(Robot):
@@ -24,8 +24,7 @@ class MyRobot(Robot):
     epsilon = 0.1
 
     size = 30
-    color = (0, 0.1, 1)
-    power = 1
+    color = (0.1, 0.2, 0.9)
 
     def _next_state(self, state, action):
         """transition function
@@ -40,31 +39,19 @@ class MyRobot(Robot):
         Raises:
             Exception -- invalid action
         """
-        last_state = state
         if action=='e':
-            if state[0]<=self.env.n_rows-1:
-                state = (state[0]+1, state[1])
+            next_state = (state[0]+1, state[1])
         elif action=='w':
-            if state[0]>=2:
-                state = (state[0]-1, state[1])
+            next_state = (state[0]-1, state[1])
         elif action=='s':
-            if state[1]>=2:
-                state = (state[0], state[1]-1)
+            next_state = (state[0], state[1]-1)
         elif action=='n':
-            if state[1]<=self.env.n_cols-1:
-                state = (state[0], state[1]+1)
+            next_state = (state[0], state[1]+1)
         else:
             raise Exception('invalid action!')
-        if self.collide(state):
-            state = last_state
-        return state
-
-    def collide(self, state):
-        for wall in self.env.walls:
-            if wall == state:
-                return True
-        else:
-            return False
+        if self.env.collide(next_state[:2]):
+            next_state = state
+        return next_state
 
 
     def _get_reward(self, state0, action, state1):
@@ -81,15 +68,15 @@ class MyRobot(Robot):
             number -- reward
         """
         if state1 in self.env.TRAPS:
-            return -1
+            return -5
         elif state1 in self.env.DEATHTRAPS:
-            return -3
+            return -10
         elif state1 == self.env.GOLD:
-            return 3
+            return 10
         elif state0 == state1:
-            return -0.2
+            return -0.5
         else:
-            return -0.05
+            return -0.5
 
     def reset(self):
         super(MyRobot, self).reset()
