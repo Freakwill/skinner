@@ -1,6 +1,8 @@
 # skinner
 Skinner, a new framework of reinforcement learning by Python
 
+It is built for the beginner of RL.
+
 
 
 It is under development, but runs stably.
@@ -15,6 +17,10 @@ It is under development, but runs stably.
 ## Design
 
 We consider the **observer design pattern**. The env and agents in it observe each other generally. The agents observe the env to how to act and got the reward, env observe the agents and other objects to render the viewer and record the information.
+
+## Feature
+
+so easy
 
 ## Use
 

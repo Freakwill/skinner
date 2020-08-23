@@ -36,12 +36,27 @@ class Gold(_Object):
 
 class Charger(_Object):
     def create_shape(self):
-        a = self.env.edge *.5 / 2
+        a = self.env.edge *.6 / 2
         self.shape = rendering.make_polygon([(-a,-a), (a,-a), (a,a), (-a,a)])
         self.shape.set_color(*self.color)
 
+    def draw(self, viewer):
+        super(Charger, self).draw(viewer)
+        a = self.env.edge *.6 / 2
+        shape1 = rendering.make_polygon([(-a/2, a/4), (0, a/4*3), (0, a/4), (a/2, -a/4), (0, -a/4)])
+        shape2 = rendering.make_polygon([(0,-a/4), (0,-a/4*3), (a/2, -a/4)])
+        shape = rendering.Compound([shape1, shape2])
+        shape.set_color(1,0.9,1)
+        viewer.add_geom(shape)
+        shape.add_attr(self.transform)
 
-class Robot(_Object, StandardAgent):
+
+class Robot(_Object, NonStandardAgent):
+
+    def create_shape(self):
+        self.shape = rendering.make_capsule(self.length, self.width)
+        self.shape.set_color(*self.color)
+
     @property
     def position(self):
         return self.state[:2]

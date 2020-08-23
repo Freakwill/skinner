@@ -23,8 +23,8 @@ class MyRobot(Robot):
     gamma = 0.8
     epsilon = 0.1
 
-    size = 30
-    color = (0, 0.1, 1)
+    length, width = 15, 45
+    color = (0, 0.2, .7)
 
     init_power = 20
 

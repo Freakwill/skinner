@@ -117,7 +117,9 @@ class StandardAgent(BaseAgent):
     def update(self, action, reward):
         key = self.last_state, action
         state = self.last_state
-        if key not in self.QTable:
+        if not self.QTable:
+            self.QTable[key] = 0
+        elif key not in self.QTable:
             self.QTable[key] = self.predict(key)
         self.QTable[key] += self.alpha * (reward + self.gamma * self.V() - self.QTable[key])
         q = self.QTable[key]
@@ -144,6 +146,7 @@ from scipy.spatial.distance import hamming
 class NonStandardAgent(StandardAgent):
 
     def predict(self, key):
+        # predict Q value of key based on current QTable
         k_v = self.QTable.items()
         i = np.argmin([hamming(k, key) for k, v in k_v])
         return list(k_v)[i][1]
