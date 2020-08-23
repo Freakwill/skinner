@@ -35,7 +35,9 @@ class BaseObject(object):
         # create a shape to draw the object
         raise NotImplementedError
 
-    def draw(self, viewer):
+    def draw(self, viewer=None):
+        if viewer is None:
+            viewer = self.env.viewer
         self.create_shape()
         viewer.add_geom(self.shape)
         self.create_transform()

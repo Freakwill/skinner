@@ -10,11 +10,7 @@ def _coordinate(position, offset=0.5):
 
 class _Object(Object):
     props = ('name', 'position', 'color', 'size')
-    default_position=(0,0)
-
-    # def __init__(self, name='', state=None, position=(1,1), color=(0,0,0), size=30):
-    #     self.position = position
-    #     super(_Object, self).__init__(state, name, coordinate=None, color=color, size=size)
+    default_position=(0, 0)
 
     @property
     def coordinate(self):
@@ -28,8 +24,8 @@ class Trap(_Object):
         
 class DeathTrap(Trap):
     '''[Summary for Class Trap]'''
-    def __init__(self, name='', state=None, position=(1,1), color=(1,0,0), size=30):
-        super(DeathTrap, self).__init__(state, name, position=position, color=color, size=size)
+    default_size = 30
+    default_color = (1,0,0)
         
 
 class Gold(_Object):
@@ -38,14 +34,19 @@ class Gold(_Object):
         gold_hole = _Object(name='gold_hole', state=True, position=self.position, color=(1, 1, 1), size=15)
         gold_hole.draw(viewer)
 
+class Charger(_Object):
+    def create_shape(self):
+        a = self.env.edge *.5 / 2
+        self.shape = rendering.make_polygon([(-a,-a), (a,-a), (a,a), (-a,a)])
+        self.shape.set_color(*self.color)
+
 
 class Robot(_Object, StandardAgent):
-    pass
-    # def create_shape(self):
-    #     from gym.envs.classic_control import rendering
-    #     self.shape = rendering.Image('robot.jpeg', width=30, height=30)
+    @property
+    def position(self):
+        return self.state[:2]
 
-class NeuralRobot(_Object, NeuralAgent):
+class NeuralRobot(Robot, NeuralAgent):
 
     @classmethod
     def key2vector(cls, key):

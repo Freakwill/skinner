@@ -134,8 +134,8 @@ class StandardAgent(BaseAgent):
             self.transform.set_translation(*self.coordinate)
 
     def post_process(self, *args, **kwargs):
-        self.epsilon **= .99
-        self.alpha **= .99
+        self.epsilon **= .995
+        self.alpha **= .995
 
 class NonStandardAgent(StandardAgent):
     def update(self, action, reward):
@@ -207,10 +207,11 @@ class MLAgent(StandardAgent):
         L = len(self.cache)
         if L > 800:
             self.cache.drop(np.arange(L-800+10))
-        if L > 10 and self.n_steps % 4 == 3:
-            self.learn()
-        if self.n_steps % 20 == 19:
-            self.updateQ()
+        if L > 200:
+            if self.n_steps % 4 == 3:
+                self.learn()
+            if self.n_steps % 20 == 19:
+                self.updateQ()
 
     def get_samples(self, size=0.9):
         # state, action, reward, next_state ~ self.cache
@@ -225,7 +226,6 @@ class MLAgent(StandardAgent):
         X = np.column_stack((states, actions))
         y = rewards + self.gamma * np.array([self.V_(s) for s in next_states])
         return X, y
-
 
     def learn(self):
         X, y = self.get_samples()

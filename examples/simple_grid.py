@@ -38,9 +38,13 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
         metadata {dict} -- configuration of rendering
     """
 
+    # n_epochs = 500
+
     n_cols = conf['n_cols']
     n_rows = conf['n_rows']
     edge = conf['edge']
+
+    CHARGER = charger.position
 
     TRAPS = [trap.position for trap in traps]
     DEATHTRAPS = [trap.position for trap in deathtraps]
@@ -49,24 +53,13 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
     def __init__(self, *args, **kwargs):
         super(MyGridWorld, self).__init__(*args, **kwargs)
         self.add_walls(conf['walls'])
+        self.add_objects((*traps, *deathtraps, charger, gold))
 
     def is_terminal(self):
-        return self.state in self.DEATHTRAPS or self.state == self.GOLD
+        return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD or self.agent.power<=0
 
     def is_successful(self):
-        return self.state == self.GOLD
-
-    def draw_objects(self):
-        for trap in traps:
-            trap.draw(self.viewer)
-        # deathtraps
-        for trap in deathtraps:
-            trap.draw(self.viewer)
-        # gold
-        gold.draw(self.viewer)
-
-        # robot
-        self.agent.draw(self.viewer)
+        return self.agent.position == self.GOLD
 
     def post_process(self):
         if self.is_successful():

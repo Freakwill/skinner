@@ -41,13 +41,36 @@ class GridWorld(BaseEnv):
 
     def render(self, mode='human', close=False):
         super(GridWorld, self).render(mode, close)
-        self.agent.position = self.agent.state
         self.agent.draw(self.viewer, flag=False)
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
+
+    def collide(self, x):
+        return not (1<=x[0]<=self.n_rows and 1<=x[1]<=self.n_cols)
 
 
 def _coordinate(position, edge=10, offset=0.5):
     return (position[0]+0.5-offset)*edge, (position[1]+0.5-offset)*edge
+
+
+class Wall(Object):
+    '''Wall Class
+    Black rectangles in the env
+    '''
+    __env = None
+
+    props = ('name', 'position', 'color', 'size')
+    default_color = (0, 0, 0)
+    default_position=(0, 0)
+
+    @property
+    def coordinate(self):
+        return _coordinate(self.position, edge=self.env.edge, offset=self.env.offset)
+
+    def create_shape(self):
+        a = self.env.edge *.95 / 2
+        self.shape = rendering.make_polygon([(-a,-a), (a,-a), (a,a), (-a,a)])
+        self.shape.set_color(*self.color)
+
 
 class GridMaze(GridWorld):
     """Grid world with walls or barriers
@@ -66,30 +89,17 @@ class GridMaze(GridWorld):
 
     def draw_walls(self):
 
-        class Wall(Object):
-            '''Wall Class
-            Black rectangles in the env
-            '''
-
-            props = ('name', 'position', 'color', 'size')
-            default_color = (0, 0, 0)
-            default_position=(0, 0)
-
-            @property
-            def coordinate(obj):
-                return _coordinate(obj.position, edge=self.edge, offset=self.offset)
-
-            def create_shape(obj):
-                a = self.edge *.95 / 2
-                obj.shape = rendering.make_polygon([(-a,-a),(a,-a),(a,a),(-a,a)])
-                obj.shape.set_color(*obj.color)
-
         for wall in self.walls:
             wall = Wall(position=wall)
+            wall.env = self
             wall.draw(self.viewer)
 
     def draw_background(self):
         # background of the grid world
         super(GridMaze, self).draw_background()
         self.draw_walls()
+
+
+    def collide(self, x):
+        return super(GridMaze, self).collide(x) or any([wall == x for wall in self.walls])
 

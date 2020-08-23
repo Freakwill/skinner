@@ -19,22 +19,13 @@ class MyRobot(Robot):
     # action_space = Discrete(4)
     action_space = FiniteSet('news')
 
-    alpha = 0.3
+    alpha = 0.2
     gamma = 0.8
-    epsilon = 0.2
+    epsilon = 0.1
 
     size = 30
     color = (0, 0.1, 1)
-
-    init_power = 16
-
-    @property
-    def power(self):
-        return self.state[2]
-
-    @property
-    def position(self):
-        return self.state[:2]
+    power = 1
 
     def _next_state(self, state, action):
         """transition function
@@ -49,25 +40,31 @@ class MyRobot(Robot):
         Raises:
             Exception -- invalid action
         """
+        last_state = state
         if action=='e':
-            next_state = (state[0]+1, state[1], state[2])
+            if state[0]<=self.env.n_rows-1:
+                state = (state[0]+1, state[1])
         elif action=='w':
-            next_state = (state[0]-1, state[1], state[2])
+            if state[0]>=2:
+                state = (state[0]-1, state[1])
         elif action=='s':
-            next_state = (state[0], state[1]-1, state[2])
+            if state[1]>=2:
+                state = (state[0], state[1]-1)
         elif action=='n':
-            next_state = (state[0], state[1]+1, state[2])
+            if state[1]<=self.env.n_cols-1:
+                state = (state[0], state[1]+1)
         else:
             raise Exception('invalid action!')
-        if self.env.collide(next_state[:2]):
-            next_state = state
+        if self.collide(state):
+            state = last_state
+        return state
+
+    def collide(self, state):
+        for wall in self.env.walls:
+            if wall == state:
+                return True
         else:
-            if next_state[:2] == self.env.CHARGER:
-                next_state = *next_state[:2], 50
-            else:
-                next_state = *next_state[:2], next_state[2]-1
-        print(next_state)
-        return next_state
+            return False
 
 
     def _get_reward(self, state0, action, state1):
@@ -83,31 +80,20 @@ class MyRobot(Robot):
         Returns:
             number -- reward
         """
-        
-        r = 0
-        if state0[-1] <=5:
-            if state1 == self.env.CHARGER:
-                r += .1
-            else:
-                r -= .1
-        else:
-            if state1 == self.env.CHARGER:
-                r -= .1
         if state1 in self.env.TRAPS:
-            r -= 1
+            return -1
         elif state1 in self.env.DEATHTRAPS:
-            r -= 3
+            return -3
         elif state1 == self.env.GOLD:
-            r += 3
+            return 3
         elif state0 == state1:
-            r -= 0.2
+            return -0.2
         else:
-            r -= 0.05
-        return r
+            return -0.05
 
     def reset(self):
         super(MyRobot, self).reset()
-        self.state = (1, self.env.n_rows, self.init_power)
+        self.state = 1, self.env.n_rows
 
 
 agent = MyRobot()
@@ -116,4 +102,4 @@ agent = MyRobot()
 if __name__ == '__main__':
     env = gym.make('GridWorld-v1', agent=agent)
     env.seed()
-    env.demo(n_epochs=500)
+    env.demo()

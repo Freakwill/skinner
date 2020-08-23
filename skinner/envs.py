@@ -24,7 +24,7 @@ class BaseEnv(gym.Env):
         return self.__objects
 
     def add_objects(self, objs):
-        self.__objects |= objs
+        self.__objects |= set(objs)
         for obj in objs:
             obj.env = self
     
@@ -80,7 +80,7 @@ class BaseEnv(gym.Env):
 
     def draw_objects(self):
         for obj in self.objects:
-            obj.draw(self)
+            obj.draw(self.viewer)
 
     def reset(self):
         for obj in self.objects:
@@ -109,9 +109,6 @@ class SingleAgentEnv(BaseEnv):
     @property
     def last_state(self):
         return self.agent.last_state
-
-    # def get_reward(self, action):
-    #     return self._get_reward(self.last_state, action, self.state)
 
     def step(self):
         is_terminal = self.is_terminal()
