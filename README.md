@@ -3,6 +3,10 @@ Skinner, a new framework of reinforcement learning by Python
 
 
 
+It is under development, but runs stably.
+
+
+
 ## Requrements
 
 - gym
@@ -10,7 +14,127 @@ Skinner, a new framework of reinforcement learning by Python
 
 ## Use
 
+### Define envs
+
+If you just want to build a simple env, then the following is an option, a grid world.
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""Demo of RL V2.0
+
+An env with some traps and a gold.
+"""
+
+from skinner import *
+from gym.envs.classic_control import rendering
+
+from objects import *
+
+# read from yaml file to create objects in env;
+# You can also define objects directly.
+import yaml
+with open('config.yaml') as fo:
+    s = fo.read()
+conf = yaml.unsafe_load(s)
+
+
+class MyGridWorld(GridMaze, SingleAgentEnv):
+    """Grid world
+    
+    A robot playing the grid world, tries to find the golden (yellow circle), meanwhile
+    it has to avoid of the traps(black circles)
+    Extends:
+        GridMaze: grid world with walls
+        SingleAgentEnv: there is only one agent
+    """
+
+    # n_epochs = 500
+
+    n_cols = conf['n_cols']
+    n_rows = conf['n_rows']
+    edge = conf['edge']
+
+    # get the positions of the objects
+    CHARGER = conf['charger'].position
+    TRAPS = [trap.position for trap in conf['traps']]
+    DEATHTRAPS = [trap.position for trap in conf['deathtraps']]
+    GOLD = trap['gold'].position
+
+    def __init__(self, *args, **kwargs):
+        super(MyGridWorld, self).__init__(*args, **kwargs)
+        self.add_walls(conf['walls'])
+        self.add_objects((*traps, *deathtraps, charger, gold))
+
+    # Define the condition when the demo of rl will stop.
+    def is_terminal(self):
+        return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD or self.agent.power<=0
+
+    def is_successful(self):
+        return self.agent.position == self.GOLD
+
+    # Following methods are not necessary, that only for recording the process of rl
+    def post_process(self):
+        if self.is_successful():
+            self.history['n_steps'].append(self.agent.n_steps)
+        else:
+            self.history['n_steps'].append(self.max_steps)
+        self.history['reward'].append(self.agent.total_reward)
+        self.agent.post_process()
+
+    def pre_process(self):
+        self.history['n_steps'] = []
+        self.history['reward'] = []
+
+    def end_process(self):
+        import pandas as pd
+        data = pd.DataFrame(self.history)
+        data.to_csv('history.csv')
+
+
+```
+
+
+
+### Define objects
+
+1. the shape of object (circle by default)
+2. the method to plot (don't override it, if the shape is simple)
+
+```python
+class _Object(Object):
+    props = ('name', 'position', 'color', 'size')
+    default_position=(0, 0)  # set default value to help you reducing the codes when creating an object
+
+    @property
+    def coordinate(self):
+        # the coordinate where the object is plotted
+        ...
+
+class Gold(_Object):
+    def draw(self, viewer):
+        '''this method is the most direct to determine how to plot the object
+        You should define the shape and coordinate
+        '''
+        ...
+
+class Charger(_Object):
+    def create_shape(self):
+        '''redefine the shape, here we define a squre with edges length of 40.
+        The default shape is a circle
+        '''
+        a = 20
+        self.shape = rendering.make_polygon([(-a,-a), (a,-a), (a,a), (-a,a)])
+        self.shape.set_color(*self.color)
+```
+
+
+
 ### Define agents
+
+1. transition function $f(s,a)$
+2. reward function $r(s,a,s')$
 
 ```python
 from skinner import *
