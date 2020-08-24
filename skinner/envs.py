@@ -68,7 +68,7 @@ class BaseEnv(gym.Env):
             self.render()
             self.epoch = i
             for k in range(self.max_steps):
-                time.sleep(0.001)
+                time.sleep(.01)
                 self.step()
                 self.render()
                 done = self.is_terminal()

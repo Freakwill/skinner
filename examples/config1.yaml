@@ -5,21 +5,19 @@
 
 
 ## number of grids
-n_cols: 7
-n_rows: 7
+n_cols: 6
+n_rows: 6
 ## size of every grid
 edge: 80
 
 
 ## positions of walls
 walls: !!set
-  {!!python/tuple [1, 6],
-  !!python/tuple [2, 6],
-  !!python/tuple [3, 6],
-  !!python/tuple [4, 6],
-  !!python/tuple [5, 4],
-  !!python/tuple [6, 3],
-  !!python/tuple [6, 6],}
+  {!!python/tuple [1, 5],
+  !!python/tuple [3, 5],
+  !!python/tuple [4, 5],
+  !!python/tuple [5, 3],
+  !!python/tuple [6, 3]}
 
 
 ## objects in environment (excluding the agent)
@@ -27,16 +25,11 @@ walls: !!set
 traps:
   - !!python/object:objects.Trap
     position: !!python/tuple
-      [1, 2]
-    color: [1,0.5,0]
-    size: 30
-  - !!python/object:objects.Trap
-    position: !!python/tuple
       [4, 2]
     color: [1,0.5,0]
     size: 30
   - !!python/object:objects.Trap
-    position: [3, 4]
+    position: [2, 3]
     color: [1,0.5,0]
     size: 30
 
@@ -45,32 +38,21 @@ deathtraps:
   - !!python/object:objects.DeathTrap
     position:  !!python/tuple
       [4, 4]
-    color: [1,0,0]
+    color: [.8,0,0.5]
     size: 30
 
   - !!python/object:objects.DeathTrap
     position:  !!python/tuple
-      [3, 2]
-    color: [1,0,0]
+      [1, 1]
+    color: [.8,0,0.5]
     size: 30
 
-  - !!python/object:objects.DeathTrap
-    position: !!python/tuple
-      [7, 2]
-    color: [1,0,0]
-    size: 30
-
-charger: !!python/object:objects.Charger
-  name: 'charger'
-  position: !!python/tuple
-    [7, 6]
-  color: [0, 1, 0]
 
 ## gold, terminal
 gold: !!python/object:objects.Gold
   name: 'gold'
   position: !!python/tuple
-    [7, 1]
+    [5, 1]
   color: [1,0.8,0]
   size: 30
 

@@ -68,22 +68,34 @@ class BaseAgent(Object):
 
 class StandardAgent(BaseAgent):
 
-    def __init__(self, QTable={}, last_state=None, init_state=None):
+    epoch = 1
+
+    def __init__(self, QTable={}, init_state=None, gamma=0.9, alpha=0.5, epsilon=0.1):
+        """[summary]
+        
+        [description]
+        
+        Keyword Arguments:
+            QTable {dict} -- Q Table (default: {{}})
+            init_state {[type]} -- initial state (default: {None})
+            gamma {number} -- discount factor (default: {0.9})
+            alpha {number} -- learning rate (default: {0.5})
+            epsilon {number} -- factor for selecting actions (default: {0.1})
+        """
         self.QTable = QTable
-        self.VTable = {}
-        for key, value in QTable.items():
-            state, action = key
-            if state not in self.VTable:
-                self.VTable[state] = self.V(state)
-            elif self.VTable[state] < q:
-                self.VTable[state] = q
-        self.last_state = last_state
+        # self.VTable = {}
+        # for key, value in QTable.items():
+        #     state, action = key
+        #     if state not in self.VTable:
+        #         self.VTable[state] = self.V(state)
+        #     elif self.VTable[state] < q:
+        #         self.VTable[state] = q
+        self.last_state = None
         self.init_state = init_state
         self.state = init_state
-        self.epoch = 1
-        self.gamma = 0.9
-        self.alpha = 0.1
-        self.epsilon = 0.05
+        self.gamma = gamma
+        self.alpha = alpha
+        self.epsilon = epsilon
 
     def select_action(self, default_action=None):
         if default_action is None:
@@ -92,41 +104,66 @@ class StandardAgent(BaseAgent):
 
 
     def step(self):
+        """
+        1. select an action
+        2. execute the action and transitate to the next state
+        3. get reward from env after the action
+        4. update the QTable or some structure presenting QTable
+        """
         action = self.select_action()
         self.next_state(action)
         reward = self.get_reward(action)
         self.update(action, reward)
+        # print(f'''action: {action}
+        # reward: {reward}
+        # state: {self.state}
+        # Q corrected: {[(action, self.Q((self.last_state, action))) for action in self.action_space]}
+        # ''')
+        
         return reward
 
 
     def Q(self, key):
+        """Predict Q value of key based on current QTable
+
+        key: tuple of (state, action)
+
+        Return 0 by default, if key is not in QTable
+        """
         return self.QTable.get(key, 0)
 
-    def V(self, state=None):
-        if state is None:
-            state = self.state
-        if state in self.VTable:
-            return self.VTable[state]
-        else:
-            return max([self.Q(key=(state, a))for a in self.action_space])
+    def V(self, state):
+        # if state in self.VTable:
+        #     return self.VTable[state]
+        return max([self.Q(key=(state, a)) for a in self.action_space])
 
-    def visited(self, key):
-        return key in self.QTable
+    def _V(self, state):
+        return max([self.Q(key=(state, a)) for a in self.action_space])
+
+    # def visited(self, key):
+    #     return key in self.QTable
 
 
     def update(self, action, reward):
+        """Update the QTable
+
+        The core code of the algorithm
+        
+        Arguments:
+            action {[type]} -- the selected action
+            reward {number} -- the reward given by the env
+        """
         key = self.last_state, action
         state = self.last_state
-        if not self.QTable:
-            self.QTable[key] = 0
-        elif key not in self.QTable:
-            self.QTable[key] = self.predict(key)
-        self.QTable[key] += self.alpha * (reward + self.gamma * self.V() - self.QTable[key])
-        q = self.QTable[key]
-        if state not in self.VTable:
-            self.VTable[state] = self.V(state)
-        elif self.VTable[state] < q:
-            self.VTable[state] = q
+        if key not in self.QTable:
+            self.QTable[key] = self.Q(key)
+        self.QTable[key] += self.alpha * (reward + self.gamma * self.V(self.state) - self.QTable[key])
+        # update V table
+        # q = self.QTable[key]
+        # if state not in self.VTable:
+        #     self.VTable[state] = self._V(state)
+        # elif self.VTable[state] < q:
+        #     self.VTable[state] = q
 
     def draw(self, viewer, flag=True):
         if flag:
@@ -135,21 +172,24 @@ class StandardAgent(BaseAgent):
             self.transform.set_translation(*self.coordinate)
 
     def post_process(self, *args, **kwargs):
-        self.epsilon **= .999
-        self.alpha **= .999
+        self.epsilon **= .9999
+        self.alpha **= .9999
 
-    def predict(self, key):
-        return 0
 
-from scipy.spatial.distance import hamming
 
 class NonStandardAgent(StandardAgent):
 
-    def predict(self, key):
+    def Q(self, key):
         # predict Q value of key based on current QTable
-        k_v = self.QTable.items()
-        i = np.argmin([hamming(k, key) for k, v in k_v])
-        return list(k_v)[i][1]
+        if key in self.QTable:
+            return self.QTable[key]
+        k_v = list(self.QTable.items())
+        if k_v:
+            ds = [self.similarity(k, key) for k, v in k_v]
+            i = np.argmax(ds)
+            return k_v[i][1] * ds[i]
+        else:
+            return 0
 
 
 import pandas as pd

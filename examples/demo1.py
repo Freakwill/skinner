@@ -12,19 +12,19 @@ gym.register(
     )
 
 from skinner import FiniteSet
-from objects import Robot
+from objects import Robot, NeuralRobot
 
 
 class MyRobot(Robot):
     # action_space = Discrete(4)
     action_space = FiniteSet('news')
 
-    alpha = 0.2
-    gamma = 0.8
-    epsilon = 0.1
+    length, width = 15, 45
+    color = (0, 0.4, .7)
 
-    size = 30
-    color = (0.1, 0.2, 0.9)
+    @property
+    def position(self):
+        return self.state
 
     def _next_state(self, state, action):
         """transition function
@@ -49,7 +49,7 @@ class MyRobot(Robot):
             next_state = (state[0], state[1]+1)
         else:
             raise Exception('invalid action!')
-        if self.env.collide(next_state[:2]):
+        if self.env.collide(next_state):
             next_state = state
         return next_state
 
@@ -67,26 +67,28 @@ class MyRobot(Robot):
         Returns:
             number -- reward
         """
+        
         if state1 in self.env.TRAPS:
-            return -5
+            r = -100
         elif state1 in self.env.DEATHTRAPS:
-            return -10
+            r = -200
         elif state1 == self.env.GOLD:
-            return 10
+            r = 100
         elif state0 == state1:
-            return -0.5
+            r = -2
         else:
-            return -0.5
+            r = -1
+        return r
 
     def reset(self):
         super(MyRobot, self).reset()
-        self.state = 1, self.env.n_rows
+        self.state = (1, self.env.n_rows)
 
 
-agent = MyRobot()
+agent = MyRobot(alpha=0.7, gamma=0.9, epsilon=0.1)
 
 
 if __name__ == '__main__':
     env = gym.make('GridWorld-v1', agent=agent)
     env.seed()
-    env.demo()
+    env.demo(n_epochs=100)

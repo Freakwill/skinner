@@ -19,14 +19,10 @@ class MyRobot(Robot):
     # action_space = Discrete(4)
     action_space = FiniteSet('news')
 
-    alpha = 0.5
-    gamma = 0.8
-    epsilon = 0.1
-
     length, width = 15, 45
     color = (0, 0.2, .7)
 
-    init_power = 20
+    init_power = 22
 
     @property
     def power(self):
@@ -61,9 +57,10 @@ class MyRobot(Robot):
             raise Exception('invalid action!')
         if self.env.collide(next_state[:2]):
             next_state = state
+            next_state = *next_state[:2], next_state[2]-1
         else:
             if next_state[:2] == self.env.CHARGER:
-                next_state = *next_state[:2], 50
+                next_state = *next_state[:2], 35
             else:
                 next_state = *next_state[:2], next_state[2]-1
         return next_state
@@ -84,24 +81,24 @@ class MyRobot(Robot):
         """
         
         r = 0
-        if state0[-1] <=4:
+        if state0[-1] <=3:
             if state1[:2] == self.env.CHARGER:
-                r += .2
+                r += .1
             else:
-                r -= .2
+                r -= 2
         else:
             if state1[:2] == self.env.CHARGER:
-                r -= .1
+                r -= 1
         if state1[:2] in self.env.TRAPS:
-            r -= 10
+            r -= 100
         elif state1[:2] in self.env.DEATHTRAPS:
             r -= 20
         elif state1[:2] == self.env.GOLD:
             r += 10
         elif state0[:2] == state1[:2]:
-            r -= 0.2
+            r -= 2
         else:
-            r -= 0.1
+            r -= 1
         return r
 
     def reset(self):
@@ -109,7 +106,7 @@ class MyRobot(Robot):
         self.state = (1, self.env.n_rows, self.init_power)
 
 
-agent = MyRobot()
+agent = MyRobot(alpha = 0.7, gamma = 0.95, epsilon = 0.1)
 
 
 if __name__ == '__main__':

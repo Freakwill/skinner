@@ -46,19 +46,19 @@ deathtraps:
   - !!python/object:objects.DeathTrap
     position:  !!python/tuple
       [4, 4]
-    color: [1,0,0]
+    color: [.8,0,0.5]
     size: 30
 
   - !!python/object:objects.DeathTrap
     position:  !!python/tuple
       [3, 1]
-    color: [1,0,0]
+    color: [.8,0,0.5]
     size: 30
 
   - !!python/object:objects.DeathTrap
     position: !!python/tuple
       [7, 2]
-    color: [1,0,0]
+    color: [.8,0,0.5]
     size: 30
 
 charger: !!python/object:objects.Charger

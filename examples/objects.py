@@ -51,7 +51,7 @@ class Charger(_Object):
         shape.add_attr(self.transform)
 
 
-class Robot(_Object, NonStandardAgent):
+class Robot(_Object, StandardAgent):
 
     def create_shape(self):
         self.shape = rendering.make_capsule(self.length, self.width)
@@ -60,6 +60,9 @@ class Robot(_Object, NonStandardAgent):
     @property
     def position(self):
         return self.state[:2]
+
+class SmartRobot(Robot, NonStandardAgent):
+    pass
 
 class NeuralRobot(Robot, NeuralAgent):
 

@@ -13,7 +13,7 @@ from gym.envs.classic_control import rendering
 from objects import *
 
 import yaml
-with open('config.yaml') as fo:
+with open('config1.yaml') as fo:
     s = fo.read()
 conf = yaml.unsafe_load(s)
 globals().update(conf)
