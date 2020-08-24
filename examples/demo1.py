@@ -91,4 +91,4 @@ agent = MyRobot(alpha=0.7, gamma=0.9, epsilon=0.1)
 if __name__ == '__main__':
     env = gym.make('GridWorld-v1', agent=agent)
     env.seed()
-    env.demo(n_epochs=100)
+    env.demo(n_epochs=200)

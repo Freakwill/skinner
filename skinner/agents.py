@@ -78,7 +78,7 @@ class StandardAgent(BaseAgent):
         Keyword Arguments:
             QTable {dict} -- Q Table (default: {{}})
             init_state {[type]} -- initial state (default: {None})
-            gamma {number} -- discount factor (default: {0.9})
+            gamma {number} -- discount rate (default: {0.9})
             alpha {number} -- learning rate (default: {0.5})
             epsilon {number} -- factor for selecting actions (default: {0.1})
         """
@@ -100,6 +100,10 @@ class StandardAgent(BaseAgent):
     def select_action(self, default_action=None):
         if default_action is None:
             default_action = self.action_space.sample()
+        # print(f'''defual action: {default_action}
+        # state: {self.state}
+        # Q corrected: {[(action, self.Q((self.last_state, action))) for action in self.action_space]}
+        # ''')
         return greedy(self.state, self.action_space, self.Q, self.epsilon, default_action)
 
 

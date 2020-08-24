@@ -32,6 +32,11 @@ class MyRobot(Robot):
     def position(self):
         return self.state[:2]
 
+    
+    def reset(self):
+        super(MyRobot, self).reset()
+        self.state = (1, self.env.n_rows, self.init_power)
+
     def _next_state(self, state, action):
         """transition function
         
@@ -101,9 +106,6 @@ class MyRobot(Robot):
             r -= 1
         return r
 
-    def reset(self):
-        super(MyRobot, self).reset()
-        self.state = (1, self.env.n_rows, self.init_power)
 
 
 agent = MyRobot(alpha = 0.7, gamma = 0.95, epsilon = 0.1)
