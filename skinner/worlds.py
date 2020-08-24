@@ -22,6 +22,33 @@ class GridWorld(BaseEnv):
     def t(cls, k, l, offset=0):
         return (k+offset)*cls.edge, (l+offset)*cls.edge
 
+    def add_objects(self, objs):
+        super(GridWorld, self).add_objects(objs)
+        import types
+        def _coordinate(o):
+            return self.coordinate(o.position)
+        for obj in objs:
+            obj._coordinate = types.MethodType(_coordinate, obj)
+
+
+    @classmethod
+    def coordinate(cls, position, offset=None):
+        """Transform a position to a coordinate
+        
+        Arguments:
+            position {tuple} -- the position of an object in the grid world
+        
+        Keyword Arguments:
+            offset {tuple} -- margin of the grid world (default: {None})
+
+        Return:
+            tuple -- the coordinate where the object lies
+        """
+
+        if offset is None:
+            offset = cls.offset
+        return (position[0]-offset)*cls.edge+cls.edge//2, (position[1]-offset)*cls.edge+cls.edge//2
+
 
     def draw_background(self):
         # background of the grid world

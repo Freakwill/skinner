@@ -3,19 +3,17 @@
 
 from skinner import *
 
-edge = 80
-def _coordinate(position, offset=0.5):
-    return (position[0]-offset)*edge+edge//2, (position[1]-offset)*edge+edge//2
-
-
 class _Object(Object):
     props = ('name', 'position', 'color', 'size')
-    default_position=(0, 0)
+    default_position = (0, 0)
 
     @property
     def coordinate(self):
-        return _coordinate(self.position)
-    
+        """
+        Here one should define a method translating position to coordinate.
+        Currently, it has been defined in the env.
+        """
+        return self._coordinate()
 
 
 class Trap(_Object):

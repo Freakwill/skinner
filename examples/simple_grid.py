@@ -26,13 +26,11 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
     it has to avoid of the traps(black circles)
 
     Extends:
-        gym.Env
+        GridMaze, SingleAgentEnv
     
     Variables:
         metadata {dict} -- configuration of rendering
     """
-
-    # n_epochs = 500
 
     n_cols = conf['n_cols']
     n_rows = conf['n_rows']

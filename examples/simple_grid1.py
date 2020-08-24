@@ -26,7 +26,7 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
     it has to avoid of the traps(black circles)
 
     Extends:
-        gym.Env
+        GridMaze
     
     Variables:
         metadata {dict} -- configuration of rendering
@@ -40,25 +40,6 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
     TRAPS = [trap.position for trap in traps]
     DEATHTRAPS = [trap.position for trap in deathtraps]
     GOLD = gold.position
-
-
-    @classmethod
-    def coordinate(cls, position, offset=None):
-        """Transform a position to a coordinate
-        
-        Arguments:
-            position {tuple} -- the position of an object in the grid world
-        
-        Keyword Arguments:
-            offset {tuple} -- margin of the grid world (default: {None})
-
-        Return:
-            tuple -- the coordinate where the object lies
-        """
-
-        if offset is None:
-            offset = cls.offset
-        return (position[0]-offset)*cls.edge+cls.edge//2, (position[1]-offset)*cls.edge+cls.edge//2
 
 
     def __init__(self, *args, **kwargs):

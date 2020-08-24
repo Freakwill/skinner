@@ -8,7 +8,7 @@ gym.register(
     id='GridWorld-v1',
     entry_point='simple_grid1:MyGridWorld',
     max_episode_steps=200,
-    reward_threshold=100.0
+    reward_threshold=1000
     )
 
 from skinner import FiniteSet
@@ -22,9 +22,6 @@ class MyRobot(Robot):
     length, width = 15, 45
     color = (0, 0.4, .7)
 
-    @property
-    def position(self):
-        return self.state
 
     def _next_state(self, state, action):
         """transition function
