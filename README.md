@@ -193,6 +193,6 @@ see scripts in `examples`
 
 ## Commemoration
 
-In memory of B. F. Skinner(1904-1990), a great American psychologist
+In memory of [B. F. Skinner](https://www.bfskinner.org/) (1904-1990), a great American psychologist
 
  ![](skinner.jpg)
