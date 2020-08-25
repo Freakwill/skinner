@@ -150,10 +150,8 @@ class Charger(_Object):
 from skinner import *
 
 class MyRobot(StandardAgent):
-    # actions = Discrete(4)
-    # define parameters
-    alpha = 0.3
-    gamma = 0.9
+    actions = Discrete(4)
+    
     # define the shape
     size = 30
     color = (0.8, 0.6, 0.4)
@@ -170,13 +168,11 @@ class MyRobot(StandardAgent):
         ...
 
     def reset(self):
-        super(MyRobot, self).reset()
         ...
 
-
-agent = MyRobot()
+# define parameters
+agent = MyRobot(alpha = 0.3, gamma = 0.9)
 ```
-
 
 
 ## Example
