@@ -37,7 +37,7 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
                 setattr(self, k.upper(), v.position)
                 self.add_objects({k:v})
             elif isinstance(v, ObjectGroup):
-                setattr(self, k.upper(), [vi.position for vi in v])
+                setattr(self, k.upper(), {vi.position for vi in v})
                 self.add_objects({k:v})
             else:
                 if k != 'walls':
@@ -71,4 +71,4 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
 
 class MyGridWorldx(MyGridWorld):
     def is_terminal(self):
-        return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD or self.angent.power <= 0
+        return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD or self.agent.power <= 0

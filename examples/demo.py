@@ -6,7 +6,7 @@ import gym
 
 gym.register(
     id='GridWorld-v1',
-    entry_point='simple_grid:MyGridWorld',
+    entry_point='simple_grid:MyGridWorldx',
     max_episode_steps=200,
     reward_threshold=100.0
     )
@@ -20,7 +20,7 @@ class MyRobot(Robot):
     The first 2 present position by default
     """
 
-    init_power = 22
+    init_power = 20
 
     @property
     def power(self):
@@ -28,7 +28,7 @@ class MyRobot(Robot):
         return self.state[2]
 
     def _reset(self):
-        self.state = (1, self.env.n_rows, self.init_power)
+        self.state = 1, self.env.n_rows, self.init_power
 
     def _next_state(self, state, action):
         """transition function
@@ -86,7 +86,7 @@ class MyRobot(Robot):
                 r -= 2
         else:
             if state1[:2] == self.env.CHARGER:
-                r -= 1
+                r -= .1
         if state1[:2] in self.env.TRAPS:
             r -= 100
         elif state1[:2] in self.env.DEATHTRAPS:
@@ -99,8 +99,18 @@ class MyRobot(Robot):
             r -= 1
         return r
 
+    def Q(self, key):
+        # predict Q value of key based on current QTable
+        if key in self.QTable:
+            return self.QTable[key]
+        for k, v in self.QTable.items():
+            if k[1]== key[1] and k[0][:2]== key[0][:2]:
+                return self.QTable[k] / 2
+        else:
+            return 0
 
-agent = MyRobot(alpha=0.7, gamma=0.95, epsilon=0.1)
+
+agent = MyRobot(alpha=0.7, gamma=0.99, epsilon=0.1)
 
 
 if __name__ == '__main__':

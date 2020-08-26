@@ -20,7 +20,8 @@ walls: !!set
   !!python/tuple [5, 4],
   !!python/tuple [6, 3],
   !!python/tuple [6, 6],
-  !!python/tuple [3, 4],}
+  !!python/tuple [3, 4],
+  !!python/tuple [6, 7]}
 
 
 ## objects in environment (excluding the agent)
@@ -29,18 +30,15 @@ traps: !!python/object:objects.ObjectGroup
   name: 'traps'
   members:
     - !!python/object:objects.Trap
-      position: !!python/tuple
-        [2, 4]
+      position: !!python/tuple [2, 4]
       color: [1,0.5,0]
       size: 30
     - !!python/object:objects.Trap
-      position: !!python/tuple
-        [4, 2]
+      position: !!python/tuple [4, 2]
       color: [1,0.5,0]
       size: 30
     - !!python/object:objects.Trap
-      position: !!python/tuple
-        [2, 3]
+      position: !!python/tuple [2, 3]
       color: [1,0.5,0]
       size: 30
 
@@ -49,34 +47,29 @@ deathtraps: !!python/object:objects.ObjectGroup
   name: 'traps'
   members:
     - !!python/object:objects.DeathTrap
-      position:  !!python/tuple
-        [4, 4]
+      position:  !!python/tuple [4, 4]
       color: [.8,0,0.5]
       size: 30
 
     - !!python/object:objects.DeathTrap
-      position:  !!python/tuple
-        [3, 1]
+      position: !!python/tuple [3, 1]
       color: [.8,0,0.5]
       size: 30
 
     - !!python/object:objects.DeathTrap
-      position: !!python/tuple
-        [7, 2]
+      position: !!python/tuple [7, 2]
       color: [.8,0,0.5]
       size: 30
 
+## charger, supply power to the robot
 charger: !!python/object:objects.Charger
   name: 'charger'
-  position: !!python/tuple
-    [7, 6]
+  position: !!python/tuple [7, 6]
   color: [0, 1, 0]
 
 ## gold, terminal
 gold: !!python/object:objects.Gold
   name: 'gold'
-  position: !!python/tuple
-    [7, 1]
-  color: [1,0.8,0]
+  position: !!python/tuple [7, 1]
+  color: [1, 0.8, 0]
   size: 30
-
