@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from .envs import *
-from .objects import Object
+from .objects import *
 
 class GridWorld(BaseEnv):
     """Grid world
@@ -14,25 +14,31 @@ class GridWorld(BaseEnv):
         metadata {dict} -- configuration of rendering
     """
 
-    n_cols = n_rows = 10
-    edge = 20
-    offset = 0.5
+    def __init__(self, n_cols=10, n_rows=10, edge=20, offset=0.5, objects={}):
+        self._objects = objects
+        self.n_cols = n_cols
+        self.n_rows = n_rows
+        self.edge = edge
+        self.offset = offset
 
-    @classmethod
-    def t(cls, k, l, offset=0):
-        return (k+offset)*cls.edge, (l+offset)*cls.edge
+
+    def t(self, k, offset=0):
+        return (k[0]+offset)*self.edge, (k[1]+offset)*self.edge
 
     def add_objects(self, objs):
         super(GridWorld, self).add_objects(objs)
         import types
         def _coordinate(o):
             return self.coordinate(o.position)
-        for obj in objs:
-            obj._coordinate = types.MethodType(_coordinate, obj)
+        for _, obj in objs.items():
+            if isinstance(obj, Object):
+                obj._coordinate = types.MethodType(_coordinate, obj)
+            else:
+                for e in obj.members:
+                    e._coordinate = types.MethodType(_coordinate, e)
 
 
-    @classmethod
-    def coordinate(cls, position, offset=None):
+    def coordinate(self, position, offset=None):
         """Transform a position to a coordinate
         
         Arguments:
@@ -46,24 +52,24 @@ class GridWorld(BaseEnv):
         """
 
         if offset is None:
-            offset = cls.offset
-        return (position[0]-offset)*cls.edge+cls.edge//2, (position[1]-offset)*cls.edge+cls.edge//2
+            offset = self.offset
+        return (position[0] - 0.5 +offset)*self.edge, (position[1]-0.5+offset)*self.edge
 
 
     def draw_background(self):
         # background of the grid world
-        offset = 0.5
+        offset = self.offset
         for k in range(self.n_cols+1):
-            line = rendering.Line(self.t(k, 0, offset), self.t(k, self.n_rows, offset))
+            line = rendering.Line(self.t((k, 0), offset), self.t((k, self.n_rows), offset))
             line.set_color(0,0,0)
             self.viewer.add_geom(line)
         for k in range(self.n_rows+1):
-            line = rendering.Line(self.t(0, k, offset), self.t(self.n_cols, k, offset))
+            line = rendering.Line(self.t((0, k), offset), self.t((self.n_cols, k), offset))
             line.set_color(0,0,0)
             self.viewer.add_geom(line)
 
     def create_viewer(self):
-        screen_width, screen_height = self.t(self.n_cols+1, self.n_rows+1)
+        screen_width, screen_height = self.t((self.n_cols+1, self.n_rows+1))
         self.viewer = rendering.Viewer(screen_width, screen_height)
 
     def render(self, mode='human', close=False):

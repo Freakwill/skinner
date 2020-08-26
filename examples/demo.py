@@ -16,25 +16,18 @@ from objects import Robot, NeuralRobot
 
 
 class MyRobot(Robot):
-    # action_space = Discrete(4)
-    action_space = FiniteSet('news')
-
-    length, width = 15, 45
-    color = (0, 0.2, .7)
+    """there are 3 nubmers in state
+    The first 2 present position by default
+    """
 
     init_power = 22
 
     @property
     def power(self):
+        # the third number of state presents the power
         return self.state[2]
 
-    @property
-    def position(self):
-        return self.state[:2]
-
-    
-    def reset(self):
-        super(MyRobot, self).reset()
+    def _reset(self):
         self.state = (1, self.env.n_rows, self.init_power)
 
     def _next_state(self, state, action):
@@ -97,9 +90,9 @@ class MyRobot(Robot):
         if state1[:2] in self.env.TRAPS:
             r -= 100
         elif state1[:2] in self.env.DEATHTRAPS:
-            r -= 20
+            r -= 200
         elif state1[:2] == self.env.GOLD:
-            r += 10
+            r += 100
         elif state0[:2] == state1[:2]:
             r -= 2
         else:
@@ -107,11 +100,12 @@ class MyRobot(Robot):
         return r
 
 
-
-agent = MyRobot(alpha = 0.7, gamma = 0.95, epsilon = 0.1)
+agent = MyRobot(alpha=0.7, gamma=0.95, epsilon=0.1)
 
 
 if __name__ == '__main__':
-    env = gym.make('GridWorld-v1', agent=agent)
+    env = gym.make('GridWorld-v1')
+    env.config('config.yaml')
+    env.add_agent(agent)
     env.seed()
     env.demo(n_epochs=2000)

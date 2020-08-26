@@ -3,7 +3,7 @@
 
 from gym.envs.classic_control import rendering
 
-class BaseObject(object):
+class BaseObject:
     __env = None
     state = None
 
@@ -35,12 +35,18 @@ class BaseObject(object):
         # create a shape to draw the object
         raise NotImplementedError
 
+    def create_transform(self):
+        raise NotImplementedError
+
     def draw(self, viewer=None):
         if viewer is None:
             viewer = self.env.viewer
         self.create_shape()
         viewer.add_geom(self.shape)
         self.create_transform()
+
+    def reset(self):
+        pass
 
 
 class Object(BaseObject):
@@ -51,8 +57,8 @@ class Object(BaseObject):
     props = ('name', 'coordinate', 'color', 'size', 'type')
     default_name = ''
     default_type = ''
-    default_coordinate = (0,0)
-    default_color = (0,0,0)
+    default_coordinate = (0, 0)
+    default_color = (0, 0, 0)
     default_size = 10
 
 
@@ -67,4 +73,42 @@ class Object(BaseObject):
             self.transform = rendering.Transform()
         self.shape.add_attr(self.transform)
 
+
+class ObjectGroup(BaseObject):
+    props = ('name', 'members')
+    default_name = ''
+
+    def __init__(self, name='', members=[]):
+        self.name = name
+        self.__members = members
+
+    def __getitem__(self, k):
+        return self.members[k]
+
+
+    @property
+    def members(self):
+        return self.__members
+
+    @members.setter
+    def members(self, ms):
+        self.__members = ms
+
+    def add_members(self, ms):
+        return self.__members.extend(ms)
+    
+
+    def draw(self, viewer=None):
+        for m in self.members:
+            m.draw(viewer)
+
+    @property
+    def env(self):
+        return self.__env
+
+    @env.setter
+    def env(self, e):
+        self.__env = e
+        for m in self.members:
+            m.__env = e
 

@@ -6,22 +6,17 @@ import gym
 
 gym.register(
     id='GridWorld-v1',
-    entry_point='simple_grid1:MyGridWorld',
+    entry_point='simple_grid:MyGridWorld',
     max_episode_steps=200,
     reward_threshold=1000
     )
 
-from skinner import FiniteSet
 from objects import Robot, NeuralRobot
 
 
 class MyRobot(Robot):
-    # action_space = Discrete(4)
-    action_space = FiniteSet('news')
-
-    length, width = 15, 45
-    color = (0, 0.4, .7)
-
+    def _reset(self):
+        self.state = 1, self.env.n_rows
 
     def _next_state(self, state, action):
         """transition function
@@ -66,26 +61,25 @@ class MyRobot(Robot):
         """
         
         if state1 in self.env.TRAPS:
-            r = -100
+            r = -20
         elif state1 in self.env.DEATHTRAPS:
-            r = -200
+            r = -30
         elif state1 == self.env.GOLD:
-            r = 100
+            r = 20
         elif state0 == state1:
             r = -2
         else:
             r = -1
         return r
 
-    def reset(self):
-        super(MyRobot, self).reset()
-        self.state = (1, self.env.n_rows)
-
 
 agent = MyRobot(alpha=0.7, gamma=0.9, epsilon=0.1)
 
 
 if __name__ == '__main__':
-    env = gym.make('GridWorld-v1', agent=agent)
+
+    env = gym.make('GridWorld-v1')
+    env.config('config1.yaml')
+    env.add_agent(agent)
     env.seed()
     env.demo(n_epochs=200)

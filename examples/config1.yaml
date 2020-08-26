@@ -22,31 +22,31 @@ walls: !!set
 
 ## objects in environment (excluding the agent)
 ## traps, not terminal
-traps:
-  - !!python/object:objects.Trap
-    position: !!python/tuple
-      [4, 2]
-    color: [1,0.5,0]
-    size: 30
-  - !!python/object:objects.Trap
-    position: !!python/tuple
-      [2, 3]
-    color: [1,0.5,0]
-    size: 30
+traps: !!python/object:objects.ObjectGroup
+  name: 'traps'
+  members:
+    - !!python/object:objects.Trap
+      position: !!python/tuple [4, 2]
+      color: [1,0.5,0]
+      size: 30
+    - !!python/object:objects.Trap
+      position: !!python/tuple [2, 3]
+      color: [1,0.5,0]
+      size: 30
 
 ## deathtraps, terminal
-deathtraps:
-  - !!python/object:objects.DeathTrap
-    position:  !!python/tuple
-      [4, 4]
-    color: [.8,0,0.5]
-    size: 30
+deathtraps: !!python/object:objects.ObjectGroup
+  name: 'deathtraps'
+  members:
+    - !!python/object:objects.DeathTrap
+      position: !!python/tuple [4, 4]
+      color: [.8,0,0.5]
+      size: 35
 
-  - !!python/object:objects.DeathTrap
-    position:  !!python/tuple
-      [1, 1]
-    color: [.8,0,0.5]
-    size: 30
+    - !!python/object:objects.DeathTrap
+      position: !!python/tuple [1, 1]
+      color: [.8,0,0.5]
+      size: 35
 
 
 ## gold, terminal

@@ -25,42 +25,46 @@ walls: !!set
 
 ## objects in environment (excluding the agent)
 ## traps, not terminal
-traps:
-  - !!python/object:objects.Trap
-    position: !!python/tuple
-      [2, 4]
-    color: [1,0.5,0]
-    size: 30
-  - !!python/object:objects.Trap
-    position: !!python/tuple
-      [4, 2]
-    color: [1,0.5,0]
-    size: 30
-  - !!python/object:objects.Trap
-    position: !!python/tuple
-      [2, 3]
-    color: [1,0.5,0]
-    size: 30
+traps: !!python/object:objects.ObjectGroup
+  name: 'traps'
+  members:
+    - !!python/object:objects.Trap
+      position: !!python/tuple
+        [2, 4]
+      color: [1,0.5,0]
+      size: 30
+    - !!python/object:objects.Trap
+      position: !!python/tuple
+        [4, 2]
+      color: [1,0.5,0]
+      size: 30
+    - !!python/object:objects.Trap
+      position: !!python/tuple
+        [2, 3]
+      color: [1,0.5,0]
+      size: 30
 
 ## deathtraps, terminal
-deathtraps:
-  - !!python/object:objects.DeathTrap
-    position:  !!python/tuple
-      [4, 4]
-    color: [.8,0,0.5]
-    size: 30
+deathtraps: !!python/object:objects.ObjectGroup
+  name: 'traps'
+  members:
+    - !!python/object:objects.DeathTrap
+      position:  !!python/tuple
+        [4, 4]
+      color: [.8,0,0.5]
+      size: 30
 
-  - !!python/object:objects.DeathTrap
-    position:  !!python/tuple
-      [3, 1]
-    color: [.8,0,0.5]
-    size: 30
+    - !!python/object:objects.DeathTrap
+      position:  !!python/tuple
+        [3, 1]
+      color: [.8,0,0.5]
+      size: 30
 
-  - !!python/object:objects.DeathTrap
-    position: !!python/tuple
-      [7, 2]
-    color: [.8,0,0.5]
-    size: 30
+    - !!python/object:objects.DeathTrap
+      position: !!python/tuple
+        [7, 2]
+      color: [.8,0,0.5]
+      size: 30
 
 charger: !!python/object:objects.Charger
   name: 'charger'

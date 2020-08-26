@@ -49,7 +49,8 @@ class BaseAgent(Object):
     def learn(self):
         raise NotImplementedError
 
-    def reset(self, env=None):
+    def reset(self):
+        self._reset()
         self.n_steps = 0
         self.total_reward = 0
 
@@ -100,15 +101,13 @@ class StandardAgent(BaseAgent):
     def select_action(self, default_action=None):
         if default_action is None:
             default_action = self.action_space.sample()
-        # print(f'''defual action: {default_action}
-        # state: {self.state}
-        # Q corrected: {[(action, self.Q((self.last_state, action))) for action in self.action_space]}
-        # ''')
         return greedy(self.state, self.action_space, self.Q, self.epsilon, default_action)
 
 
     def step(self):
         """
+        A single step of iteration
+
         1. select an action
         2. execute the action and transitate to the next state
         3. get reward from env after the action
@@ -118,9 +117,11 @@ class StandardAgent(BaseAgent):
         self.next_state(action)
         reward = self.get_reward(action)
         self.update(action, reward)
+
+        # uncomment the following code to debug
         # print(f'''action: {action}
         # reward: {reward}
-        # state: {self.state}
+        # state: {self.last_state} => {self.state}
         # Q corrected: {[(action, self.Q((self.last_state, action))) for action in self.action_space]}
         # ''')
         
@@ -143,10 +144,6 @@ class StandardAgent(BaseAgent):
 
     def _V(self, state):
         return max([self.Q(key=(state, a)) for a in self.action_space])
-
-    # def visited(self, key):
-    #     return key in self.QTable
-
 
     def update(self, action, reward):
         """Update the QTable
@@ -176,6 +173,7 @@ class StandardAgent(BaseAgent):
             self.transform.set_translation(*self.coordinate)
 
     def post_process(self, *args, **kwargs):
+        # post process after a single step
         self.epsilon **= .9999
         self.alpha **= .9999
 

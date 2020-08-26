@@ -14,18 +14,18 @@ class BaseEnv(gym.Env):
 
     history = {}
     max_steps = 200
-
-    __objects = set()
     viewer = None
-    # __components = set()
+
+    def __init__(self, objects={}):
+        self._objects = objects
 
     @property
     def objects(self):
-        return self.__objects
+        return self._objects
 
     def add_objects(self, objs):
-        self.__objects |= set(objs)
-        for obj in objs:
+        self._objects.update(objs)
+        for _, obj in objs.items():
             obj.env = self
     
     
@@ -68,7 +68,7 @@ class BaseEnv(gym.Env):
             self.render()
             self.epoch = i
             for k in range(self.max_steps):
-                time.sleep(.01)
+                time.sleep(.001)
                 self.step()
                 self.render()
                 done = self.is_terminal()
@@ -79,25 +79,28 @@ class BaseEnv(gym.Env):
         self.close()
 
     def draw_objects(self):
-        for obj in self.objects:
+        for _, obj in self.objects.items():
             obj.draw(self.viewer)
 
     def reset(self):
-        for obj in self.objects:
-            obj.draw(self)
+        for _, obj in self.objects.items():
+            obj.reset()
 
 class MultiAgentEnv(BaseEnv):
-    def __init__(self, objects=[]):
-        self.add_objects(objects)
-        self.viewer = None
-        self.state = None
+    pass
 
 
 class SingleAgentEnv(BaseEnv):
-    def __init__(self, agent):
-        self.agent = agent
+    def __init__(self, agent=None):
         if agent:
-            self.add_objects({agent})
+            self.add_objects({'agent': agent})
+
+    @property
+    def agent(self):
+        return self.objects['agent']
+
+    def add_agent(self, agent):
+        self.add_objects({'agent': agent}) 
 
     def reset(self):
         self.agent.reset()
@@ -111,10 +114,14 @@ class SingleAgentEnv(BaseEnv):
         return self.agent.last_state
 
     def step(self):
+        """A single step of the itertion of the env.
+        Most important part is to call step method of the unique agent.
+        """
         is_terminal = self.is_terminal()
         if is_terminal:
-            return
-        r = self.agent.step()
-        return self.agent, r, is_terminal, {}
+            return self.agent, r, True, {}
+        else:
+            r = self.agent.step()
+            return self.agent, r, False, {}
 
     

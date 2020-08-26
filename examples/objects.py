@@ -29,8 +29,11 @@ class DeathTrap(Trap):
 class Gold(_Object):
     def draw(self, viewer):
         super(Gold, self).draw(viewer)
-        gold_hole = _Object(name='gold_hole', state=True, position=self.position, color=(1, 1, 1), size=15)
-        gold_hole.draw(viewer)
+        r = self.env.edge / 7
+        shape = rendering.make_circle(r)
+        shape.set_color(1,1,1)
+        viewer.add_geom(shape)
+        shape.add_attr(self.transform)
 
 class Charger(_Object):
     def create_shape(self):
@@ -49,11 +52,28 @@ class Charger(_Object):
         shape.add_attr(self.transform)
 
 
+from skinner import FiniteSet
+
 class Robot(_Object, StandardAgent):
+    action_space = FiniteSet('news')
+    color = (0, 0.4, .7)
 
     def create_shape(self):
-        self.shape = rendering.make_capsule(self.length, self.width)
+        length, width = self.env.edge / 4, self.env.edge / 2
+        self.shape = rendering.make_capsule(length, width)
         self.shape.set_color(*self.color)
+
+    def draw(self, viewer, *args, **kwargs):
+        super(Robot, self).draw(viewer, *args, **kwargs)
+        r = self.env.edge / 10
+        left_eye = rendering.make_circle(r)
+        left_eye.add_attr(rendering.Transform(translation=(-r, 0)))
+        right_eye = rendering.make_circle(r)
+        right_eye.add_attr(rendering.Transform(translation=(2*r, 0)))
+        shape = rendering.Compound([left_eye, right_eye])
+        shape.set_color(.7,0.2,0.2)
+        viewer.add_geom(shape)
+        shape.add_attr(self.transform)
 
     @property
     def position(self):

@@ -3,27 +3,21 @@
 
 """Demo of RL V2.0
 
-在这个格子世界的一个机器人要去寻找金子（黄色圆圈），同时需要避免很多陷阱（黑色圆圈）
-
+A robot playing the grid world, tries to find the gold, meanwhile
+it has to avoid of the traps
 """
 
 from skinner import *
 from gym.envs.classic_control import rendering
 
-from objects import *
-
-import yaml
-with open('config.yaml') as fo:
-    s = fo.read()
-conf = yaml.unsafe_load(s)
-globals().update(conf)
+from objects import _Object
 
 
 class MyGridWorld(GridMaze, SingleAgentEnv):
     """Grid world
     
-    A robot playing the grid world, tries to find the golden (yellow circle), meanwhile
-    it has to avoid of the traps(black circles)
+    A robot playing the grid world, tries to find the gold (yellow circle), meanwhile
+    it has to avoid of the traps (orange and red circles)
 
     Extends:
         GridMaze, SingleAgentEnv
@@ -32,23 +26,27 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
         metadata {dict} -- configuration of rendering
     """
 
-    n_cols = conf['n_cols']
-    n_rows = conf['n_rows']
-    edge = conf['edge']
-
-    CHARGER = charger.position
-
-    TRAPS = [trap.position for trap in traps]
-    DEATHTRAPS = [trap.position for trap in deathtraps]
-    GOLD = gold.position
-
-    def __init__(self, *args, **kwargs):
-        super(MyGridWorld, self).__init__(*args, **kwargs)
-        self.add_walls(conf['walls'])
-        self.add_objects((*traps, *deathtraps, charger, gold))
+    def config(self, conf):
+        if isinstance(conf, str):
+            import yaml
+            with open(conf) as fo:
+                s = fo.read()
+            conf = yaml.unsafe_load(s)
+        for k, v in conf.items():
+            if isinstance(v, Object):
+                setattr(self, k.upper(), v.position)
+                self.add_objects({k:v})
+            elif isinstance(v, ObjectGroup):
+                setattr(self, k.upper(), [vi.position for vi in v])
+                self.add_objects({k:v})
+            else:
+                if k != 'walls':
+                    setattr(self, k, v)
+                else:
+                    self.add_walls(v)
 
     def is_terminal(self):
-        return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD or self.agent.power<=0
+        return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD
 
     def is_successful(self):
         return self.agent.position == self.GOLD
@@ -70,3 +68,7 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
         data = pd.DataFrame(self.history)
         data.to_csv('history.csv')
 
+
+class MyGridWorldx(MyGridWorld):
+    def is_terminal(self):
+        return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD or self.angent.power <= 0
