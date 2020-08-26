@@ -42,14 +42,6 @@ from gym.envs.classic_control import rendering
 
 from objects import *
 
-# read from yaml file to create objects in env;
-# You can also define objects directly.
-import yaml
-with open('config.yaml') as fo:
-    s = fo.read()
-conf = yaml.unsafe_load(s)
-
-
 class MyGridWorld(GridMaze, SingleAgentEnv):
     """Grid world
     
@@ -59,18 +51,14 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
         GridMaze: grid world with walls
         SingleAgentEnv: there is only one agent
     """
-
-    # n_epochs = 500
-
-    n_cols = conf['n_cols']
-    n_rows = conf['n_rows']
-    edge = conf['edge']
-
+    
+    # configure the env
+    
     # get the positions of the objects
-    CHARGER = conf['charger'].position
-    TRAPS = [trap.position for trap in conf['traps']]
-    DEATHTRAPS = [trap.position for trap in conf['deathtraps']]
-    GOLD = trap['gold'].position
+    CHARGER = ...
+    TRAPS = ...
+    DEATHTRAPS = ...
+    GOLD = ...
 
     def __init__(self, *args, **kwargs):
         super(MyGridWorld, self).__init__(*args, **kwargs)
@@ -156,6 +144,10 @@ class MyRobot(StandardAgent):
     size = 30
     color = (0.8, 0.6, 0.4)
 
+    def _reset(self):
+        # define the initial state
+        ...
+        
     def _next_state(self, state, action):
         """transition function: s, a -> s'
         """
@@ -167,8 +159,6 @@ class MyRobot(StandardAgent):
         """
         ...
 
-    def reset(self):
-        ...
 
 # define parameters
 agent = MyRobot(alpha = 0.3, gamma = 0.9)

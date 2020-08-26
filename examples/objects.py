@@ -46,10 +46,10 @@ class Charger(_Object):
         a = self.env.edge *.6 / 2
         shape1 = rendering.make_polygon([(-a/2, a/4), (0, a/4*3), (0, a/4), (a/2, -a/4), (0, -a/4)])
         shape2 = rendering.make_polygon([(0,-a/4), (0,-a/4*3), (a/2, -a/4)])
-        shape = rendering.Compound([shape1, shape2])
-        shape.set_color(1,0.9,1)
-        viewer.add_geom(shape)
-        shape.add_attr(self.transform)
+        logo = rendering.Compound([shape1, shape2])
+        logo.set_color(1,0.9,1)
+        viewer.add_geom(logo)
+        logo.add_attr(self.transform)
 
 
 from skinner import FiniteSet
@@ -62,18 +62,21 @@ class Robot(_Object, StandardAgent):
         length, width = self.env.edge / 4, self.env.edge / 2
         self.shape = rendering.make_capsule(length, width)
         self.shape.set_color(*self.color)
-
-    def draw(self, viewer, *args, **kwargs):
-        super(Robot, self).draw(viewer, *args, **kwargs)
         r = self.env.edge / 10
         left_eye = rendering.make_circle(r)
         left_eye.add_attr(rendering.Transform(translation=(-r, 0)))
         right_eye = rendering.make_circle(r)
         right_eye.add_attr(rendering.Transform(translation=(2*r, 0)))
-        shape = rendering.Compound([left_eye, right_eye])
-        shape.set_color(.7,0.2,0.2)
-        viewer.add_geom(shape)
-        shape.add_attr(self.transform)
+        self.eyes = rendering.Compound([left_eye, right_eye])
+        self.eyes.set_color(.7,0.2,0.2)
+
+    def draw(self, viewer, flag=True):
+        if flag:
+            super(Robot, self).draw(viewer, flag=True)
+            viewer.add_geom(self.eyes)
+            self.eyes.add_attr(self.transform)
+        else:
+            self.transform.set_translation(*self.coordinate)
 
     @property
     def position(self):
