@@ -24,6 +24,10 @@ so easy
 
 ## Use
 
+### Quick start
+
+run `demo1.py` in examples.
+
 ### Define envs
 
 If you just want to build a simple env, then the following is an option, a grid world.

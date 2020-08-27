@@ -31,13 +31,14 @@ class MyRobot(Robot):
         Raises:
             Exception -- invalid action
         """
-        if action=='e':
+
+        if action == 'e':
             next_state = (state[0]+1, state[1])
-        elif action=='w':
+        elif action == 'w':
             next_state = (state[0]-1, state[1])
-        elif action=='s':
+        elif action == 's':
             next_state = (state[0], state[1]-1)
-        elif action=='n':
+        elif action == 'n':
             next_state = (state[0], state[1]+1)
         else:
             raise Exception('invalid action!')
