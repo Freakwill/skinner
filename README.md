@@ -5,9 +5,13 @@ It is built for the beginner of RL.
 
 
 
-It is under development, the APIs are not designed perfectly, but runs stably.
+It is under development, the APIs are not designed perfectly, but runs stably. For grid worlds, it is mature enough.
 
 
+
+Enjoy `skinner`!
+
+![](rat.gif)
 
 ## Requrements
 
