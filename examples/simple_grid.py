@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Demo of RL V2.0
+"""Demo of RL
 
 A robot playing the grid world, tries to find the gold, meanwhile
 it has to avoid of the traps

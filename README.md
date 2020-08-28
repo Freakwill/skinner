@@ -5,7 +5,7 @@ It is built for the beginner of RL.
 
 
 
-It is under development, but runs stably.
+It is under development, the APIs are not designed perfectly, but runs stably.
 
 
 
@@ -30,7 +30,9 @@ so easy
 
 ### Quick start
 
-run `demo1.py` in examples.
+run `demo.py` in examples.
+
+other examples: `demo1.py, demo2.py`
 
 ### Define envs
 
@@ -40,7 +42,7 @@ If you just want to build a simple env, then the following is an option, a grid 
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Demo of RL V2.0
+"""Demo of RL
 
 An env with some traps and a gold.
 """
@@ -62,7 +64,7 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
     
     # configure the env
     
-    # get the positions of the objects
+    # get the positions of the objects (done automatically)
     CHARGER = ...
     TRAPS = ...
     DEATHTRAPS = ...
@@ -99,6 +101,76 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
         data.to_csv('history.csv')
 
 
+```
+
+
+
+#### Configure env and its objects
+
+see `conf.yaml` for an example. The object classes would be defined in `objects.py`.
+
+```yaml
+# Grid Maze: 
+# n_cols * n_rows: size of the maze, the number of squares
+# edge: the length of the edge of each square
+# walls: the positions of walls as the components of the environment
+
+
+## number of grids
+n_cols: 7
+n_rows: 7
+## size of every grid
+edge: 80
+
+
+## positions of walls
+walls: !!set
+  {
+  !!python/tuple [2, 6],
+  !!python/tuple [3, 6],
+  ...
+  !!python/tuple [4, 2]}
+
+
+## objects in environment (excluding the agent)
+## traps, not terminal
+traps: !!python/object:objects.ObjectGroup
+  name: 'traps'
+  members:
+    - !!python/object:objects.Trap
+      position: !!python/tuple [3, 5]
+      color: [1,0.5,0]
+      size: 30
+    - !!python/object:objects.Trap
+      position: !!python/tuple [1, 3]
+      color: [1,0.5,0]
+      size: 30
+    - !!python/object:objects.Trap
+      position: !!python/tuple [7, 1]
+      color: [1,0.5,0]
+      size: 30
+
+## deathtraps, terminal
+deathtraps: !!python/object:objects.ObjectGroup
+  name: 'deathtraps'
+  members:
+    - !!python/object:objects.DeathTrap
+      position: !!python/tuple [6, 5]
+      color: [.8,0,0.5]
+      size: 35
+
+    - !!python/object:objects.DeathTrap
+      position: !!python/tuple [2, 1]
+      color: [.8,0,0.5]
+      size: 35
+
+## gold, terminal
+gold: !!python/object:objects.Gold
+  name: 'gold'
+  position: !!python/tuple
+    [7, 7]
+  color: [1,0.8,0]
+  size: 30
 ```
 
 
@@ -187,6 +259,6 @@ see scripts in `examples`
 
 ## Commemoration
 
-In memory of [B. F. Skinner](https://www.bfskinner.org/) (1904-1990), a great American psychologist
+In memory of [B. F. Skinner](https://www.bfskinner.org/) (1904-1990), a great American psychologist. The RL is mainly inspirited by his behaviorism.
 
  ![](skinner.jpg)
