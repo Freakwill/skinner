@@ -14,6 +14,10 @@ It is under development, but runs stably.
 - gym
 - numpy
 
+## Download
+
+download from github, or pypi by pip command `pip install skinner`.
+
 ## Design
 
 We consider the **observer design pattern**. The env and agents in it observe each other generally. The agents observe the env to how to act and got the reward, env observe the agents and other objects to render the viewer and record the information.

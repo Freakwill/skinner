@@ -41,12 +41,13 @@ class BaseObject:
     def draw(self, viewer=None):
         if viewer is None:
             viewer = self.env.viewer
-        self.create_shape()
+        if not hasattr(self, 'shape'):
+            self.create_shape()
         viewer.add_geom(self.shape)
         self.create_transform()
 
     def reset(self):
-        pass
+        raise NotImplementedError
 
 
 class Object(BaseObject):
@@ -61,6 +62,8 @@ class Object(BaseObject):
     default_color = (0, 0, 0)
     default_size = 10
 
+    def reset(self):
+        pass
 
     def create_shape(self):
         self.shape = rendering.make_circle(self.size)
@@ -84,6 +87,10 @@ class ObjectGroup(BaseObject):
 
     def __getitem__(self, k):
         return self.members[k]
+
+    def reset(self):
+        for m in self.members:
+            m.reset()
 
 
     @property

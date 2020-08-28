@@ -24,6 +24,11 @@ class DeathTrap(Trap):
     '''[Summary for Class Trap]'''
     default_size = 30
     default_color = (1,0,0)
+
+    def reset(self):
+        if not hasattr(self, 'shape'):
+            self.create_shape()
+        self.shape.set_color(*self.color)
         
 
 class Gold(_Object):
@@ -51,6 +56,9 @@ class Charger(_Object):
         viewer.add_geom(logo)
         logo.add_attr(self.transform)
 
+
+class Button(_Object):
+    size = 20
 
 from skinner import FiniteSet
 

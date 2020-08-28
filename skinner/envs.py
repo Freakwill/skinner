@@ -12,8 +12,8 @@ class BaseEnv(gym.Env):
         'video.frames_per_second': 2
     }
 
-    history = {}
-    max_steps = 200
+    history = None
+    max_steps = 100
     viewer = None
 
     def __init__(self, objects={}):
@@ -56,8 +56,10 @@ class BaseEnv(gym.Env):
     def pre_process(self, *args, **kwargs):
         pass
 
-    def end_process(self, *args, **kwargs):
-        pass
+    def end_process(self):
+        import pandas as pd
+        if isinstance(self.history, pd.DataFrame):
+            self.history.to_csv('history.csv')
 
     def demo(self, n_epochs=200, history=None):
         import time
@@ -68,7 +70,7 @@ class BaseEnv(gym.Env):
             self.render()
             self.epoch = i
             for k in range(self.max_steps):
-                time.sleep(.001)
+                time.sleep(.0001)
                 self.step()
                 self.render()
                 done = self.is_terminal()
@@ -85,6 +87,12 @@ class BaseEnv(gym.Env):
     def reset(self):
         for _, obj in self.objects.items():
             obj.reset()
+
+    def step(self):
+        is_terminal = self.is_terminal()
+        if not is_terminal:
+            for _, obj in self.objects.items():
+                obj.step()
 
 class MultiAgentEnv(BaseEnv):
     pass
@@ -118,10 +126,10 @@ class SingleAgentEnv(BaseEnv):
         Most important part is to call step method of the unique agent.
         """
         is_terminal = self.is_terminal()
-        if is_terminal:
-            return self.agent, r, True, {}
-        else:
-            r = self.agent.step()
-            return self.agent, r, False, {}
+        if not is_terminal:
+            self.agent.step()
+
+    def post_process(self):
+        self.agent.post_process()
 
     

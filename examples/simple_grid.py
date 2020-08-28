@@ -26,25 +26,6 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
         metadata {dict} -- configuration of rendering
     """
 
-    def config(self, conf):
-        if isinstance(conf, str):
-            import yaml
-            with open(conf) as fo:
-                s = fo.read()
-            conf = yaml.unsafe_load(s)
-        for k, v in conf.items():
-            if isinstance(v, Object):
-                setattr(self, k.upper(), v.position)
-                self.add_objects({k:v})
-            elif isinstance(v, ObjectGroup):
-                setattr(self, k.upper(), {vi.position for vi in v})
-                self.add_objects({k:v})
-            else:
-                if k != 'walls':
-                    setattr(self, k, v)
-                else:
-                    self.add_walls(v)
-
     def is_terminal(self):
         return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD
 
@@ -53,22 +34,35 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
 
     def post_process(self):
         if self.is_successful():
-            self.history['n_steps'].append(self.agent.n_steps)
+            n = self.agent.n_steps
         else:
-            self.history['n_steps'].append(self.max_steps)
-        self.history['reward'].append(self.agent.total_reward)
+            n = self.max_steps
+        self.history = self.history.append({'n_steps': n, 'total rewards':self.agent.total_reward}, ignore_index=True)
         self.agent.post_process()
 
     def pre_process(self):
-        self.history['n_steps'] = []
-        self.history['reward'] = []
-
-    def end_process(self):
         import pandas as pd
-        data = pd.DataFrame(self.history)
-        data.to_csv('history.csv')
+        self.history = pd.DataFrame(columns=('n_steps', 'total rewards'))
 
 
-class MyGridWorldx(MyGridWorld):
+class MyGridWorld1(MyGridWorld):
     def is_terminal(self):
         return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD or self.agent.power <= 0
+
+
+class MyGridWorld2(MyGridWorld):
+    def is_terminal(self):
+        return (self.agent.position in self.DEATHTRAPS and self.agent.flag == 1) or self.agent.position == self.GOLD
+
+    def render(self, mode='human', close=False):
+        super(MyGridWorld2, self).render(mode, close)
+        if self.agent.flag == 0:
+            for t in self.objects['deathtraps']:
+                t.shape.set_color(0, 0.8, 0)
+        return self.viewer.render(return_rgb_array=mode == 'rgb_array')
+
+    def reset(self):
+        super(MyGridWorld2, self).reset()
+        self.objects['deathtraps'].reset()
+
+
