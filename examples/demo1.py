@@ -6,7 +6,7 @@ import gym
 
 gym.register(
     id='GridWorld-v1',
-    entry_point='simple_grid:MyGridWorldx',
+    entry_point='simple_grid:MyGridWorld1',
     max_episode_steps=200,
     reward_threshold=100.0
     )
@@ -103,11 +103,15 @@ class MyRobot(Robot):
         # predict Q value of key based on current QTable
         if key in self.QTable:
             return self.QTable[key]
+        dm = 100
+        q = 0
         for k, v in self.QTable.items():
-            if k[1]== key[1] and k[0][:2]== key[0][:2]:
-                return self.QTable[k] / 2
-        else:
-            return 0
+            if k[1] == key[1] and k[0][:2] == key[0][:2]:
+                d = abs(k[0][2] - key[0][2])
+                if d < dm:
+                    dm = d
+                    q = self.QTable[key]
+        return q
 
 
 agent = MyRobot(alpha=0.7, gamma=0.99, epsilon=0.1)

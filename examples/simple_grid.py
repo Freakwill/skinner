@@ -51,18 +51,24 @@ class MyGridWorld1(MyGridWorld):
 
 
 class MyGridWorld2(MyGridWorld):
+
     def is_terminal(self):
-        return (self.agent.position in self.DEATHTRAPS and self.agent.flag == 1) or self.agent.position == self.GOLD
+        return ((self.agent.position == self.DEATHTRAP1 and self.agent.flag1 == 0) or 
+        (self.agent.position == self.DEATHTRAP2 and self.agent.flag2 == 0) or 
+        self.agent.position == self.DEATHTRAP3 or self.agent.position == self.GOLD)
 
     def render(self, mode='human', close=False):
         super(MyGridWorld2, self).render(mode, close)
-        if self.agent.flag == 0:
-            for t in self.objects['deathtraps']:
-                t.shape.set_color(0, 0.8, 0)
+        if self.agent.flag1:
+            self.objects['deathtrap1'].shape.set_color(0, 0.8, 0)
+        if self.agent.flag2:
+            self.objects['deathtrap2'].shape.set_color(0, 0.8, 0)
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
-    def reset(self):
-        super(MyGridWorld2, self).reset()
-        self.objects['deathtraps'].reset()
+
+    # def reset(self):
+    #     super(MyGridWorld2, self).reset()
+    #     self.objects['deathtrap1'].reset()
+    #     self.objects['deathtrap2'].reset()
 
 

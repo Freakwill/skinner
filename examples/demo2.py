@@ -17,12 +17,16 @@ from objects import Robot, NeuralRobot
 class MyRobot(Robot):
 
     @property
-    def flag(self):
+    
+    def flag1(self):
         return self.state[2]
 
+    @property
+    def flag2(self):
+        return self.state[3]
 
     def _reset(self):
-        self.state = 1, self.env.n_rows, 1
+        self.state = 1, self.env.n_rows, 0, 0
 
     def _next_state(self, state, action):
         """Transition function
@@ -39,19 +43,21 @@ class MyRobot(Robot):
         """
 
         if action == 'e':
-            next_state = (state[0]+1, state[1], state[2])
+            next_state = (state[0]+1, state[1], *state[2:])
         elif action == 'w':
-            next_state = (state[0]-1, state[1], state[2])
+            next_state = (state[0]-1, state[1], *state[2:])
         elif action == 's':
-            next_state = (state[0], state[1]-1, state[2])
+            next_state = (state[0], state[1]-1, *state[2:])
         elif action == 'n':
-            next_state = (state[0], state[1]+1, state[2])
+            next_state = (state[0], state[1]+1, *state[2:])
         else:
             raise Exception('invalid action!')
         if self.env.collide(next_state[:2]):
             next_state = state
-        if next_state[:2] == self.env.BUTTON:
-            next_state = (next_state[0], next_state[1], 0)
+        if next_state[:2] == self.env.BUTTON1:
+            next_state = (next_state[0], next_state[1], 1, next_state[3])
+        elif next_state[:2] == self.env.BUTTON2:
+            next_state = (next_state[0], next_state[1], next_state[2], 1)
         return next_state
 
 
@@ -71,11 +77,18 @@ class MyRobot(Robot):
         
         if state1[:2] in self.env.TRAPS:
             r = -20
-        elif state1[:2] in self.env.DEATHTRAPS:
+        elif state1[:2] == self.env.DEATHTRAP1:
             if state1[2]:
-                r = -30
-            else:
                 r = -1
+            else:
+                r = -30
+        elif state1[:2] == self.env.DEATHTRAP2:
+            if state1[3]:
+                r = -1
+            else:
+                r = -30
+        elif state1[:2] == self.env.DEATHTRAP3:
+            r = -30
         elif state1[:2] == self.env.GOLD:
             r = 20
         elif state0[:2] == state1[:2]:

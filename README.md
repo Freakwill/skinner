@@ -38,6 +38,10 @@ run `demo.py` in examples.
 
 other examples: `demo1.py, demo2.py`
 
+### Examples
+
+The author make 3 examples. users are suggested to review the codes. Define objects in `objects.py`, define new envs in `simple_grid.py` then write a demonstration programming in a script (see `demo.py`).
+
 ### Define envs
 
 If you just want to build a simple env, then the following is an option, a grid world.

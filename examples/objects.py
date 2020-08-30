@@ -29,7 +29,10 @@ class DeathTrap(Trap):
         if not hasattr(self, 'shape'):
             self.create_shape()
         self.shape.set_color(*self.color)
-        
+
+    # def step(self):
+    #     if self.button.pressed:
+    #         self.shape.set_color(0, 0.8, 0)
 
 class Gold(_Object):
     def draw(self, viewer):

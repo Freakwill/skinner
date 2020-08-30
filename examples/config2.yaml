@@ -22,7 +22,8 @@ walls: !!set
   !!python/tuple [1, 4], 
   !!python/tuple [3, 6],
   !!python/tuple [3, 7],
-  !!python/tuple [5, 3]}
+  !!python/tuple [5, 3],
+  !!python/tuple [5, 1]}
 
 
 ## objects in environment (excluding the agent)
@@ -44,24 +45,32 @@ traps: !!python/object:objects.ObjectGroup
       size: 30
 
 ## deathtraps, terminal
-deathtraps: !!python/object:objects.ObjectGroup
-  name: 'deathtraps'
-  members:
-    - !!python/object:objects.DeathTrap
+deathtrap1: !!python/object:objects.DeathTrap
       position: !!python/tuple [2, 4]
       color: [.8,0,0.5]
       size: 35
 
-    - !!python/object:objects.DeathTrap
+deathtrap2: !!python/object:objects.DeathTrap
+      position: !!python/tuple [5, 2]
+      color: [.8,0,0.5]
+      size: 35
+
+deathtrap3: !!python/object:objects.DeathTrap
       position: !!python/tuple [2, 1]
       color: [.8,0,0.5]
       size: 35
 
 
 ## button, not terminal
-button: !!python/object:objects.Button
+button1: !!python/object:objects.Button
   name: 'button'
   position: !!python/tuple [4, 7]
+  color: [0.1,0.2,0.8]
+  size: 15
+
+button2: !!python/object:objects.Button
+  name: 'button'
+  position: !!python/tuple [1, 1]
   color: [0.1,0.2,0.8]
   size: 15
 
