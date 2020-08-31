@@ -34,9 +34,11 @@ so easy
 
 ### Quick start
 
-run `demo.py` in examples.
+run `demo.py` in examples. There are other examples: `demo1.py, demo2.py`.
 
-other examples: `demo1.py, demo2.py`
+Also, one could watch animations in [`bilibili`](https://www.bilibili.com/video/bv1ca4y1E7Dr)
+
+
 
 ### Examples
 
@@ -267,6 +269,6 @@ see scripts in `examples`
 
 ## Commemoration
 
-In memory of [B. F. Skinner](https://www.bfskinner.org/) (1904-1990), a great American psychologist. The RL is mainly inspirited by his behaviorism.
+In memory of [B. F. Skinner](https://www.bfskinner.org/) (1904-1990), a great American psychologist. The RL is mainly inspired by his behaviorism. There are many contributors in the history of behaviorist psychology, he may be the most famous one.
 
  ![](skinner.jpg)
