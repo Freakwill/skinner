@@ -66,13 +66,13 @@ class MyGridWorld2(MyGridWorld):
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
 
-class MyGridWorld2(MyGridWorld):
+class MyGridWorld3(MyGridWorld):
 
     def is_terminal(self):
         return ((self.agent.position == self.DEATHTRAP1 and self.agent.flag1 == 0) or 
         (self.agent.position == self.DEATHTRAP2 and self.agent.flag2 == 0) or 
         (self.agent.position == self.DEATHTRAP3 and self.agent.flag3 == 0) or 
-        self.agent.position == self.DEATHTRAP4 or self.power <=0
+        self.agent.position == self.DEATHTRAP4 or self.power <=0 or
         self.agent.position == self.GOLD)
 
     def render(self, mode='human', close=False):

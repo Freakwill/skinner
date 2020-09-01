@@ -47,7 +47,12 @@ traps: !!python/object:objects.ObjectGroup
       color: [1,0.5,0]
       size: 30
     - !!python/object:objects.Trap
-      position: !!python/tuple [7, 1]
+      position: !!python/tuple [8, 1]
+      color: [1,0.5,0]
+      size: 30
+
+    - !!python/object:objects.Trap
+      position: !!python/tuple [7, 3]
       color: [1,0.5,0]
       size: 30
 
