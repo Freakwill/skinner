@@ -79,14 +79,14 @@ class MyRobot(Robot):
         """
         
         r = 0
-        if state0[-1] <=3:
-            if state1[:2] == self.env.CHARGER:
-                r += .1
-            else:
-                r -= 2
-        else:
-            if state1[:2] == self.env.CHARGER:
-                r -= .1
+        # if state0[-1] <=3:
+        #     if state1[:2] == self.env.CHARGER:
+        #         r += .1
+        #     else:
+        #         r -= .1
+        # else:
+        #     if state1[:2] == self.env.CHARGER:
+        #         r -= .1
         if state1[:2] in self.env.TRAPS:
             r -= 100
         elif state1[:2] in self.env.DEATHTRAPS:

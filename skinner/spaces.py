@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from sklearn.preprocessing import OneHotEncoder
 
 from collections.abc import Iterable
 from gym.spaces import Discrete
@@ -44,23 +43,35 @@ class FiniteSet(Discrete):
         return "FiniteSet(%d)" % self.n
 
     def __eq__(self, other):
-        return isinstance(other, FiniteSet) and self.n == other.n
+        return isinstance(other, FiniteSet) and set(self.actions) == set(other.actions)
 
     def __getitem__(self, k):
         return self.actions[k]
 
-    def onehot_encode(self, k=None):
+    def encode(self, k=None, encoder=None):
+        """Encode the space with numbers
+        
+        Keyword Arguments:
+            k {int} -- the index of an element or list of the indexes (default: {None})
+            encoder {object} -- An encoder with scikit-learn apis,
+            such as OneHotEncoder (default: {None})
+        
+        Returns:
+            np.ndarray -- the result of encoding
+        """
+        
         if k is None:
             X = [[a] for a in self.actions]
-            self.onehot_encoder = OneHotEncoder().fit(X)
-            self.onehot = self.onehot_encoder.transform(X).toarray()
+            if not hasattr(self, 'encoder'):
+                self.encoder = encoder.fit(X)
+            return self.encoder.transform(X).toarray()
         else:
-            if not hasattr(self, 'onehot_encoder'):
-                self.onehot_encode()
+            if not hasattr(self, 'encoder'):
+                encoding = self.encode(encoder=encoder)
             if isinstance(k, int):
-                return self.onehot[k]
+                return encoding[k]
             elif isinstance(k, (list, tuple, np.ndarray)):
-                return self.onehot_encoder.transform([[_] for _ in k]).toarray()
+                return self.encoder.transform([[_] for _ in k]).toarray()
             else:
-                return self.onehot_encoder.transform([[k]]).toarray()[0]
+                return self.encoder.transform([[k]]).toarray()[0]
 

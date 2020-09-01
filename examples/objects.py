@@ -7,14 +7,6 @@ class _Object(Object):
     props = ('name', 'position', 'color', 'size')
     default_position = (0, 0)
 
-    @property
-    def coordinate(self):
-        """
-        Here one should define a method translating position to coordinate.
-        Currently, it has been defined in the env.
-        """
-        return self._coordinate()
-
 
 class Trap(_Object):
     '''[Summary for Class Trap]'''
@@ -93,14 +85,35 @@ class Robot(_Object, StandardAgent):
     def position(self):
         return self.state[:2]
 
-class SmartRobot(Robot, NonStandardAgent):
+class SmartRobot(Robot):
     pass
+
+#     from utils import *
+class BayesRobot(Robot):
+    '''[Summary for Class BayesRobot]'''
+    def __init__(self, *args, **kwargs):
+        super(BayesRobot, self).__init__(*args, **kwargs)
+        self.state_count = {self.init_state:1}
+
+    def step(self, *args, **kwargs):
+        super(BayesRobot, self).step(*args, **kwargs)
+        if self.state in self.state_count:
+            self.state_count[self.state] += 1
+        else:
+            self.state_count[self.state] = 1
+
+    def Q(self, key):
+        pass
+
+
+from sklearn.preprocessing import OneHotEncoder
+_encoder = OneHotEncoder()
 
 class NeuralRobot(Robot, NeuralAgent):
 
     @classmethod
     def key2vector(cls, key):
-        return *key[0], *cls.action_space.onehot_encode(key[1])
+        return *key[0], *cls.action_space.encode(k=key[1], encoder=_encoder)
 
 
     def get_samples(self, size=0.8):
@@ -111,7 +124,7 @@ class NeuralRobot(Robot, NeuralAgent):
         states = self.cache.loc[inds, 'state'].values
         states = np.array([state for state in states])
         actions = self.cache.loc[inds, 'action'].values
-        actions = self.action_space.onehot_encode(actions)
+        actions = self.action_space.encode(k=actions, encoder=_encoder)
         rewards = self.cache.loc[inds, 'reward'].values
         next_states = self.cache.loc[inds, 'state+'].values
         X = np.column_stack((states, actions))

@@ -76,6 +76,23 @@ class Object(BaseObject):
             self.transform = rendering.Transform()
         self.shape.add_attr(self.transform)
 
+    @property
+    def coordinate(self):
+        """
+        If an object has no absolute coordinate and is plotted with a relative position
+        according to the env.
+        One should define a method translating position to coordinate.
+        It is recommanded to define the method dynamically in envs, for example,
+
+        import types
+        def _coordinate(o):
+            return self.coordinate(o.position)
+        for _, obj in objs.items():
+            if isinstance(obj, Object):
+                obj._coordinate = types.MethodType(_coordinate, obj)
+        """
+        return self._coordinate()
+
 
 class ObjectGroup(BaseObject):
     props = ('name', 'members')

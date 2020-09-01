@@ -195,11 +195,6 @@ class _Object(Object):
     props = ('name', 'position', 'color', 'size')
     default_position=(0, 0)  # set default value to help you reducing the codes when creating an object
 
-    @property
-    def coordinate(self):
-        # the coordinate where the object is plotted
-        ...
-
 class Gold(_Object):
     def draw(self, viewer):
         '''this method is the most direct to determine how to plot the object

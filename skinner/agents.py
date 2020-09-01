@@ -180,18 +180,19 @@ class StandardAgent(BaseAgent):
 
 
 class NonStandardAgent(StandardAgent):
+    similarity = None    # similarity of pairs of (state, action)
 
-    def Q(self, key):
-        # predict Q value of key based on current QTable
-        if key in self.QTable:
-            return self.QTable[key]
-        k_v = list(self.QTable.items())
-        if k_v:
-            ds = [self.similarity(k, key) for k, v in k_v]
-            i = np.argmax(ds)
-            return k_v[i][1] * ds[i]
-        else:
-            return 0
+    # def Q(self, key):
+    #     # predict Q value of key based on current QTable
+    #     if key in self.QTable:
+    #         return self.QTable[key]
+    #     k_v = list(self.QTable.items())
+    #     if k_v:
+    #         ds = [self.similarity(k, key) for k, v in k_v]
+    #         i = np.argmax(ds)
+    #         return k_v[i][1] * ds[i]
+    #     else:
+    #         return 0
 
 
 import pandas as pd
@@ -202,7 +203,8 @@ class MLAgent(StandardAgent):
 
     flag = True
 
-    def __init__(self, state=None, last_state=None, init_state=None, mainQ=None, targetQ=None):
+    def __init__(self, state=None, last_state=None, init_state=None, mainQ=None, targetQ=None, *args, **kwargs):
+        super(MLAgent, self).__init__(*args, **kwargs)
         self.state = state
         self.last_state = last_state
         self.init_state = init_state

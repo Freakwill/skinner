@@ -110,8 +110,8 @@ class SingleAgentEnv(BaseEnv):
     def add_agent(self, agent):
         self.add_objects({'agent': agent}) 
 
-    def reset(self):
-        self.agent.reset()
+    # def reset(self):
+    #     self.agent.reset()
 
     @property
     def state(self):

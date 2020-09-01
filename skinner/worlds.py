@@ -75,7 +75,7 @@ class GridWorld(BaseEnv):
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
     def collide(self, x):
-        return not (1<=x[0]<=self.n_rows and 1<=x[1]<=self.n_cols)
+        return not (1<=x[0]<=self.n_cols and 1<=x[1]<=self.n_rows)
 
     def config(self, conf):
         """Configure the grid world with objects
@@ -134,6 +134,12 @@ class GridMaze(GridWorld):
     def add_walls(self, walls):
         self.__walls |= walls
 
+    def add_wall_matrix(self, m):
+        r, c = m.shape
+        walls = set((i, j) for i in range(1, r+1) for j in range(1, c+1) if m[i, j])
+        self.add_walls(walls)
+                    
+
     @property
     def walls(self):
         return self.__walls
@@ -143,8 +149,7 @@ class GridMaze(GridWorld):
         return self.__walls
 
     def draw_walls(self):
-
-        for wall in self.walls:
+        for wall in self.WALLS:
             wall = Wall(position=wall)
             wall.env = self
             wall.draw(self.viewer)

@@ -15,6 +15,7 @@ from objects import Robot, NeuralRobot
 
 
 class MyRobot(Robot):
+    init_power = 25
 
     @property
     def flag1(self):
@@ -24,8 +25,17 @@ class MyRobot(Robot):
     def flag2(self):
         return self.state[3]
 
+    @property
+    def flag3(self):
+        return self.state[4]
+
+    @property
+    def power(self):
+        return self.state[5]
+    
+
     def _reset(self):
-        self.state = 1, self.env.n_rows, 0, 0
+        self.state = 1, self.env.n_rows, 0, 0, 0, self.init_power
 
     def _next_state(self, state, action):
         """Transition function
@@ -54,9 +64,13 @@ class MyRobot(Robot):
         if self.env.collide(next_state[:2]):
             next_state = state
         if next_state[:2] == self.env.BUTTON1:
-            next_state = (next_state[0], next_state[1], 1, next_state[3])
+            next_state = (next_state[0], next_state[1], 1, next_state[3], next_state[4], next_state[5])
         elif next_state[:2] == self.env.BUTTON2:
-            next_state = (next_state[0], next_state[1], next_state[2], 1)
+            next_state = (next_state[0], next_state[1], next_state[2], 1, next_state[4], next_state[5])
+        elif next_state[:2] == self.env.BUTTON3:
+            next_state = (*next_state[:4], 1, next_state[5])
+        elif next_state[:2] == self.env.CHARGER:
+            next_state = (*next_state[:5], 50)
         return next_state
 
 
@@ -87,6 +101,11 @@ class MyRobot(Robot):
             else:
                 r = -30
         elif state1[:2] == self.env.DEATHTRAP3:
+            if state1[3]:
+                r = -1
+            else:
+                r = -30
+        elif state1[:2] == self.env.DEATHTRAP4:
             r = -30
         elif state1[:2] == self.env.GOLD:
             r = 20
@@ -100,7 +119,7 @@ class MyRobot(Robot):
 if __name__ == '__main__':
 
     env = gym.make('GridWorld-v1')
-    env.config('config2.yaml')
+    env.config('config3.yaml')
     agent = MyRobot(alpha=0.7, gamma=0.9, epsilon=0.1)
     env.add_agent(agent)
     env.seed()

@@ -1,0 +1,115 @@
+# Grid Maze: 
+# n_cols * n_rows: size of the maze, the number of squares
+# edge: the length of the edge of each square
+# walls: the positions of walls as the components of the environment
+
+
+## number of grids
+n_cols: 10
+n_rows: 10
+## size of every grid
+edge: 50
+
+
+## positions of walls
+walls: !!set
+  {
+  !!python/tuple [6, 10],
+  !!python/tuple [6, 9],
+  !!python/tuple [6, 8],
+  !!python/tuple [6, 7], 
+  !!python/tuple [6, 6],
+  !!python/tuple [3, 10],
+  !!python/tuple [3, 9],
+  !!python/tuple [4, 8],
+  !!python/tuple [1, 5],
+  !!python/tuple [2, 5],
+  !!python/tuple [4, 5],
+  !!python/tuple [5, 5],
+  !!python/tuple [7, 3],
+  !!python/tuple [7, 4],
+  !!python/tuple [8, 1],
+  !!python/tuple [9, 2],
+  !!python/tuple [10, 7],
+  !!python/tuple [9, 7],
+  !!python/tuple [8, 7],
+  !!python/tuple [8, 9],
+}
+
+
+## objects in environment (excluding the agent)
+## traps, not terminal
+traps: !!python/object:objects.ObjectGroup
+  name: 'traps'
+  members:
+    - !!python/object:objects.Trap
+      position: !!python/tuple [7, 5]
+      color: [1,0.5,0]
+      size: 24
+    - !!python/object:objects.Trap
+      position: !!python/tuple [1, 9]
+      color: [1,0.5,0]
+      size: 24
+    - !!python/object:objects.Trap
+      position: !!python/tuple [7, 1]
+      color: [1,0.5,0]
+      size: 24
+    - !!python/object:objects.Trap
+      position: !!python/tuple [3, 2]
+      color: [1,0.5,0]
+      size: 24
+    - !!python/object:objects.Trap
+      position: !!python/tuple [6, 5]
+      color: [1,0.5,0]
+      size: 24
+
+## deathtraps, terminal
+deathtrap1: !!python/object:objects.DeathTrap
+      position: !!python/tuple [3, 5]
+      color: [.8,0,0.5]
+      size: 25
+
+deathtrap2: !!python/object:objects.DeathTrap
+      position: !!python/tuple [8, 2]
+      color: [.8,0,0.5]
+      size: 25
+
+deathtrap3: !!python/object:objects.DeathTrap
+      position: !!python/tuple [8, 8]
+      color: [.8,0,0.5]
+      size: 25
+
+
+## button, not terminal
+button1: !!python/object:objects.Button
+  name: 'button'
+  position: !!python/tuple [4, 9]
+  color: [0.1,0.2,0.8]
+  size: 10
+
+button2: !!python/object:objects.Button
+  name: 'button'
+  position: !!python/tuple [1, 1]
+  color: [0.1,0.2,0.8]
+  size: 10
+
+button3: !!python/object:objects.Button
+  name: 'button'
+  position: !!python/tuple [10, 5]
+  color: [0.1,0.2,0.8]
+  size: 10
+
+## gold, terminal
+gold: !!python/object:objects.Gold
+  name: 'gold'
+  position: !!python/tuple [10, 9]
+  color: [1,0.8,0]
+  size: 20
+
+
+## charger, supply power to the robot
+charger: !!python/object:objects.Charger
+  name: 'charger'
+  position: !!python/tuple [10, 1]
+  color: [0, 1, 0]
+  size: 15
