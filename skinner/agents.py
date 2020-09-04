@@ -10,6 +10,7 @@ class BaseAgent(Object):
     state: state
     last_state: last state
     init_state: init state'''
+
     env = None
     n_steps = 0
     total_reward = 0
@@ -37,8 +38,8 @@ class BaseAgent(Object):
     def visited(self, key):
         raise NotImplementedError
 
-    def predict(self, key):
-        return 0
+    def is_terminal(self, key):
+        raise NotImplementedError
 
     def update(self, key):
         raise NotImplementedError
@@ -66,6 +67,30 @@ class BaseAgent(Object):
         """
         raise NotImplementedError
 
+    def save(self, fname=None):
+        import pickle, pathlib
+        if self.name:
+            pklPath = pathlib.Path(f'{self.name}.pkl')
+        else:
+            pklPath = pathlib.Path('agent.pkl')
+        with open(pklPath, 'wb') as fo:
+            pickle.dump(self, fo)
+
+    def load(self, fname=None):
+        import pickle, pathlib
+        if fname:
+            if isinstance(fname, str):
+                fname = pathlib.Path(fname)
+        elif self.name:
+            pklPath = pathlib.Path(f'{self.name}.pkl')
+        else:
+            pklPath = pathlib.Path('agent.pkl')
+        if pklPath.exists():
+            with open(pklPath, 'rb') as fo:
+                return pickle.load(fo)
+        else:
+            raise IOError('Do not find the pickle file!')
+
 
 class StandardAgent(BaseAgent):
 
@@ -84,13 +109,13 @@ class StandardAgent(BaseAgent):
             epsilon {number} -- factor for selecting actions (default: {0.1})
         """
         self.QTable = QTable
-        # self.VTable = {}
-        # for key, value in QTable.items():
-        #     state, action = key
-        #     if state not in self.VTable:
-        #         self.VTable[state] = self.V(state)
-        #     elif self.VTable[state] < q:
-        #         self.VTable[state] = q
+        self.VTable = {}
+        for key, value in QTable.items():
+            state, action = key
+            if state not in self.VTable:
+                self.VTable[state] = self.V(state)
+            elif self.VTable[state] < q:
+                self.VTable[state] = q
         self.last_state = None
         self.init_state = init_state
         self.state = init_state
@@ -98,11 +123,8 @@ class StandardAgent(BaseAgent):
         self.alpha = alpha
         self.epsilon = epsilon
 
-    def select_action(self, default_action=None):
-        if default_action is None:
-            default_action = self.action_space.sample()
-        return greedy(self.state, self.action_space, self.Q, self.epsilon, default_action)
-
+    def select_action(self):
+        return greedy(self.state, self.action_space, self.Q, self.epsilon)
 
     def step(self):
         """
@@ -113,18 +135,19 @@ class StandardAgent(BaseAgent):
         3. get reward from env after the action
         4. update the QTable or some structure presenting QTable
         """
+
         action = self.select_action()
         self.next_state(action)
         reward = self.get_reward(action)
         self.update(action, reward)
 
         # uncomment the following code to debug
-        # print(f'''action: {action}
-        # reward: {reward}
-        # state: {self.last_state} => {self.state}
-        # Q corrected: {[(action, self.Q((self.last_state, action))) for action in self.action_space]}
-        # ''')
-        
+        print(f'''action: {action}
+        reward: {reward}
+        state: {self.last_state} => {self.state}
+        Q corrected: {[(action, self.Q((self.last_state, action))) for action in self.action_space]}
+        ''')
+
         return reward
 
 
@@ -140,13 +163,13 @@ class StandardAgent(BaseAgent):
     def V(self, state):
         # if state in self.VTable:
         #     return self.VTable[state]
-        return max([self.Q(key=(state, a)) for a in self.action_space])
+        return self._V(state)
 
     def _V(self, state):
         return max([self.Q(key=(state, a)) for a in self.action_space])
 
     def update(self, action, reward):
-        """Update the QTable
+        """Update the QTable by Q Learning
 
         The core code of the algorithm
         
@@ -154,17 +177,20 @@ class StandardAgent(BaseAgent):
             action {[type]} -- the selected action
             reward {number} -- the reward given by the env
         """
+
         key = self.last_state, action
-        state = self.last_state
         if key not in self.QTable:
             self.QTable[key] = self.Q(key)
-        self.QTable[key] += self.alpha * (reward + self.gamma * self.V(self.state) - self.QTable[key])
-        # update V table
+        v = self.V(self.state)
+        self.QTable[key] += self.alpha * (reward + self.gamma * v - self.QTable[key])
+
         # q = self.QTable[key]
-        # if state not in self.VTable:
-        #     self.VTable[state] = self._V(state)
-        # elif self.VTable[state] < q:
-        #     self.VTable[state] = q
+        # if self.last_state in self.VTable:
+        #     if self.VTable[self.last_state] < q:
+        #         self.VTable[self.last_state] = q
+        # elif q>=0:
+        #     self.VTable[self.last_state] = q
+
 
     def draw(self, viewer, flag=True):
         if flag:
@@ -174,25 +200,64 @@ class StandardAgent(BaseAgent):
 
     def post_process(self, *args, **kwargs):
         # post process after a single step
-        self.epsilon **= .9999
-        self.alpha **= .9999
+        self.epsilon *= .9999
+        self.alpha *= .9999
+
+    def save_QTable(self, fname=None):
+        with open('Q Table.txt', 'wb') as fo:
+            fo.write(str(self.QTable))
 
 
+class SarsaAgent(StandardAgent):
 
-class NonStandardAgent(StandardAgent):
+    def reset(self):
+        self._reset()
+        self.n_steps = 0
+        self.total_reward = 0
+        self.action = self.select_action()
+
+    def step(self):
+        """
+        A single step of iteration
+
+        1. execute the action and transitate to the next state
+        2. get reward from env after the action
+        3. update the QTable or some structure presenting QTable with sarsa
+        """
+        
+        self.next_state(self.action)
+        reward = self.get_reward(self.action)
+        self.update(self.action, reward)
+
+        return reward
+
+    def update(self, action, reward):
+        """Update the QTable by Sarsa
+
+        The core code of the algorithm
+        
+        Arguments:
+            action {[type]} -- the selected action
+            reward {number} -- the reward given by the env
+        """
+        key = self.last_state, action
+        if key not in self.QTable:
+            self.QTable[key] = self.Q(key)
+        self.action = self.select_action()
+        self.QTable[key] += self.alpha * (reward + self.gamma * self.Q((self.state, self.action)) - self.QTable[key])
+
+
+class BoltzmannAgent(StandardAgent):
     similarity = None    # similarity of pairs of (state, action)
+    temperature = 10
 
-    # def Q(self, key):
-    #     # predict Q value of key based on current QTable
-    #     if key in self.QTable:
-    #         return self.QTable[key]
-    #     k_v = list(self.QTable.items())
-    #     if k_v:
-    #         ds = [self.similarity(k, key) for k, v in k_v]
-    #         i = np.argmax(ds)
-    #         return k_v[i][1] * ds[i]
-    #     else:
-    #         return 0
+    def select_action(self):
+        return boltzmann(self.state, self.action_space, self.Q, temperature=self.temperature, epsilon=self.epsilon)
+
+    def post_process(self, *args, **kwargs):
+        # post process after a single step
+        super(BoltzmannAgent, self).post_process(*args, **kwargs)
+        self.temperature *= 0.99
 
 
 import pandas as pd
@@ -215,18 +280,21 @@ class MLAgent(StandardAgent):
         self.alpha = 0.1
         self.epsilon = 0.2
         self.cache = pd.DataFrame(columns=('state', 'action', 'reward', 'state+'))
+        self.max_cache = 500
 
     @classmethod
     def key2vector(cls, key):
         return *key[0], key[1]
 
     def Q(self, key):
+        # Q value of main net
         if not hasattr(self.mainQ, 'coefs_'):
             return 0
         x = self.__class__.key2vector(key)
         return self.mainQ.predict([x])[0]
 
     def Q_(self, key):
+        # Q value of target net
         try:
             x = self.key2vector(key)
             return self.targetQ.predict([x])[0]
@@ -247,15 +315,15 @@ class MLAgent(StandardAgent):
     def update(self, action, reward):
         self.cache = self.cache.append({'state':self.last_state, 'action':action, 'reward':reward, 'state+':self.state}, ignore_index=True)
         L = len(self.cache)
-        if L > 800:
-            self.cache.drop(np.arange(L-800+10))
-        if L > 200:
-            if self.n_steps % 2 == 1:
+        if L > self.max_cache:
+            self.cache.drop(np.arange(L-self.max_cache+10))
+        if L > 100:
+            if self.n_steps % 5 == 4:
                 self.learn()
-            if self.n_steps % 20 == 19:
+            if self.n_steps % 30 == 29:
                 self.updateQ()
 
-    def get_samples(self, size=0.9):
+    def get_samples(self, size=0.1):
         # state, action, reward, next_state ~ self.cache
         L = len(self.cache)
         size = int(size * L)
@@ -280,7 +348,7 @@ class MLAgent(StandardAgent):
 class NeuralAgent(MLAgent):
     def __init__(self, *args, **kwargs):
         super(NeuralAgent, self).__init__(*args, **kwargs)
-        self.mainQ = MLPRegressor(hidden_layer_sizes=(20,), max_iter=10, warm_start=True, learning_rate='adaptive')
+        self.mainQ = MLPRegressor(hidden_layer_sizes=(6,), max_iter=100, warm_start=True, learning_rate='adaptive')
         self.targetQ = MLPRegressor(max_iter=1)
 
     def updateQ(self):

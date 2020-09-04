@@ -58,8 +58,6 @@ An env with some traps and a gold.
 """
 
 from skinner import *
-from gym.envs.classic_control import rendering
-
 from objects import *
 
 class MyGridWorld(GridMaze, SingleAgentEnv):

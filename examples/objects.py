@@ -85,25 +85,49 @@ class Robot(_Object, StandardAgent):
     def position(self):
         return self.state[:2]
 
+class SarsaRobot(Robot, SarsaAgent):
+    pass
+
 class SmartRobot(Robot):
     pass
 
-#     from utils import *
+class BoltzmannRobot(Robot, BoltzmannAgent):
+    pass
+
+from utils import *
 class BayesRobot(Robot):
     '''[Summary for Class BayesRobot]'''
     def __init__(self, *args, **kwargs):
         super(BayesRobot, self).__init__(*args, **kwargs)
         self.state_count = {self.init_state:1}
 
-    def step(self, *args, **kwargs):
-        super(BayesRobot, self).step(*args, **kwargs)
+    def update(self, action, reward):
+        super(BayesRobot, self).update(action, reward)
         if self.state in self.state_count:
             self.state_count[self.state] += 1
         else:
             self.state_count[self.state] = 1
+        if action in self.action_count:
+            self.action_count[action] += 1
+        else:
+            self.action_count[action] = 1
 
-    def Q(self, key):
-        pass
+    @property
+    def state_proba(self):
+        C = self.state_count
+        N = np.sum([n for s, n in C.items()])
+        return {s: n/N for s, n in C.items()}
+
+    @property
+    def action_proba(self):
+        C = self.action_count
+        N = np.sum([n for s, n in C.items()])
+        return {s: n/N for s, n in C.items()}
+
+
+    def select_action(self):
+        return greedy(self.state, self.action_space, self.Q, self.epsilon)
+
 
 
 from sklearn.preprocessing import OneHotEncoder

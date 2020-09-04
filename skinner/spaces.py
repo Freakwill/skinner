@@ -30,6 +30,10 @@ class FiniteSet(Discrete):
     def sample(self):
         return self.np_random.choice(self.actions)
 
+    # def sample_with_proba(self, proba=None):
+    #     k = super(FiniteSet, self).sample_with_proba(proba)
+    #     return self[k]
+
     def contains(self, x):
         if isinstance(x, int):
             as_int = x
