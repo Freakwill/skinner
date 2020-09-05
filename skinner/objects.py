@@ -134,5 +134,5 @@ class ObjectGroup(BaseObject):
     def env(self, e):
         self.__env = e
         for m in self.members:
-            m.__env = e
+            m.env = e
 

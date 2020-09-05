@@ -46,8 +46,6 @@ class BaseEnv(gym.Env):
             # draw the objects in env
             self.draw_objects()
 
-        if self.state is None:
-            return None
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
     def post_process(self, *args, **kwargs):
@@ -61,16 +59,17 @@ class BaseEnv(gym.Env):
         if isinstance(self.history, pd.DataFrame):
             self.history.to_csv('history.csv')
 
-    def demo(self, n_epochs=200, history=None):
+    def demo(self, n_epochs=200, n_steps=1000, history=None):
         import time
         # demo of RL
+        n_steps = min(n_steps, self.max_steps)
         self.pre_process()
         for i in range(n_epochs):
             self.reset()
             self.render()
             self.epoch = i
-            for k in range(self.max_steps):
-                time.sleep(.0001)
+            for k in range(n_steps):
+                time.sleep(.00001)
                 self.step()
                 self.render()
                 done = self.is_terminal()
@@ -112,14 +111,6 @@ class SingleAgentEnv(BaseEnv):
 
     # def reset(self):
     #     self.agent.reset()
-
-    @property
-    def state(self):
-        return self.agent.state
-
-    @property
-    def last_state(self):
-        return self.agent.last_state
 
     def step(self):
         """A single step of the itertion of the env.

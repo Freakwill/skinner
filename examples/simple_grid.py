@@ -72,11 +72,11 @@ class MyGridWorld3(MyGridWorld):
         return ((self.agent.position == self.DEATHTRAP1 and self.agent.flag1 == 0) or 
         (self.agent.position == self.DEATHTRAP2 and self.agent.flag2 == 0) or 
         (self.agent.position == self.DEATHTRAP3 and self.agent.flag3 == 0) or 
-        self.agent.position == self.DEATHTRAP4 or self.power <=0 or
+        self.agent.position == self.DEATHTRAP4 or self.agent.power <=0 or
         self.agent.position == self.GOLD)
 
     def render(self, mode='human', close=False):
-        super(MyGridWorld2, self).render(mode, close)
+        super(MyGridWorld3, self).render(mode, close)
         if self.agent.flag1:
             self.objects['deathtrap1'].shape.set_color(0, 0.8, 0)
         if self.agent.flag2:

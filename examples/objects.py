@@ -4,17 +4,22 @@
 from skinner import *
 
 class _Object(Object):
-    props = ('name', 'position', 'color', 'size')
+    props = ('name', 'position', 'color', 'proportion')
     default_position = (0, 0)
+    default_proportion = 0.5
+
+    @property
+    def size(self):
+        return self.proportion * self.env.edge
 
 
 class Trap(_Object):
-    '''[Summary for Class Trap]'''
+    '''Common Trap'''
     pass
         
 class DeathTrap(Trap):
-    '''[Summary for Class Trap]'''
-    default_size = 30
+    '''Death Trap
+    '''
     default_color = (1,0,0)
 
     def reset(self):
@@ -53,7 +58,7 @@ class Charger(_Object):
 
 
 class Button(_Object):
-    size = 20
+    default_size = 20
 
 from skinner import FiniteSet
 
@@ -94,12 +99,15 @@ class SmartRobot(Robot):
 class BoltzmannRobot(Robot, BoltzmannAgent):
     pass
 
-from utils import *
-class BayesRobot(Robot):
-    '''[Summary for Class BayesRobot]'''
+from skinner.policies import *
+class BayesRobot(BoltzmannRobot):
+    '''BayesRobot
+    Agent with action seletion method based on naive Bayes
+    '''
     def __init__(self, *args, **kwargs):
         super(BayesRobot, self).__init__(*args, **kwargs)
         self.state_count = {self.init_state:1}
+        self.action_count ={a:0 for a in self.action_space}
 
     def update(self, action, reward):
         super(BayesRobot, self).update(action, reward)
@@ -122,11 +130,14 @@ class BayesRobot(Robot):
     def action_proba(self):
         C = self.action_count
         N = np.sum([n for s, n in C.items()])
-        return {s: n/N for s, n in C.items()}
+        l = 0.001
+        return {a: (C[a]+l)/(N+l*self.action_space.n) for a in self.action_space}
 
 
     def select_action(self):
-        return greedy(self.state, self.action_space, self.Q, self.epsilon)
+        if len(self.QTable)<10:
+            return super(BayesRobot, self).select_action()
+        return bayes(self.state, self.action_space, self.QTable, epsilon=self.epsilon, temperature=self.temperature, pa=self.action_proba, ps=self.state_proba)
 
 
 

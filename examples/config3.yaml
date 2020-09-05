@@ -45,39 +45,44 @@ traps: !!python/object:objects.ObjectGroup
     - !!python/object:objects.Trap
       position: !!python/tuple [7, 5]
       color: [1,0.5,0]
-      size: 24
+      proportion: 0.48
     - !!python/object:objects.Trap
       position: !!python/tuple [1, 9]
       color: [1,0.5,0]
-      size: 24
+      proportion: 0.48
     - !!python/object:objects.Trap
       position: !!python/tuple [7, 1]
       color: [1,0.5,0]
-      size: 24
+      proportion: 0.48
     - !!python/object:objects.Trap
       position: !!python/tuple [3, 2]
       color: [1,0.5,0]
-      size: 24
+      proportion: 0.48
     - !!python/object:objects.Trap
       position: !!python/tuple [6, 5]
       color: [1,0.5,0]
-      size: 24
+      proportion: 0.48
 
 ## deathtraps, terminal
 deathtrap1: !!python/object:objects.DeathTrap
       position: !!python/tuple [3, 5]
       color: [.8,0,0.5]
-      size: 25
+      proportion: 0.5
 
 deathtrap2: !!python/object:objects.DeathTrap
       position: !!python/tuple [8, 2]
       color: [.8,0,0.5]
-      size: 25
+      proportion: 0.5
 
 deathtrap3: !!python/object:objects.DeathTrap
       position: !!python/tuple [8, 8]
       color: [.8,0,0.5]
-      size: 25
+      proportion: 0.5
+
+deathtrap4: !!python/object:objects.DeathTrap
+      position: !!python/tuple [2, 1]
+      color: [.8,0,0.5]
+      proportion: 0.5
 
 
 ## button, not terminal
@@ -85,26 +90,26 @@ button1: !!python/object:objects.Button
   name: 'button'
   position: !!python/tuple [4, 9]
   color: [0.1,0.2,0.8]
-  size: 10
+  proportion: 0.2
 
 button2: !!python/object:objects.Button
   name: 'button'
   position: !!python/tuple [1, 1]
   color: [0.1,0.2,0.8]
-  size: 10
+  proportion: 0.2
 
 button3: !!python/object:objects.Button
   name: 'button'
   position: !!python/tuple [10, 5]
   color: [0.1,0.2,0.8]
-  size: 10
+  proportion: 0.2
 
 ## gold, terminal
 gold: !!python/object:objects.Gold
   name: 'gold'
   position: !!python/tuple [10, 9]
   color: [1,0.8,0]
-  size: 20
+  proportion: 0.4
 
 
 ## charger, supply power to the robot
@@ -112,4 +117,4 @@ charger: !!python/object:objects.Charger
   name: 'charger'
   position: !!python/tuple [10, 1]
   color: [0, 1, 0]
-  size: 15
+  proportion: 0.3

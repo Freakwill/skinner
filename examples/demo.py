@@ -11,10 +11,11 @@ gym.register(
     reward_threshold=1000
     )
 
-from objects import Robot, NeuralRobot
+from objects import Robot, NeuralRobot, BoltzmannRobot, BayesRobot
 
 
-class MyRobot(Robot):
+class MyRobot(BayesRobot):
+    
     def _reset(self):
         self.state = 1, self.env.n_rows
 

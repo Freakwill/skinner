@@ -11,7 +11,7 @@ gym.register(
     reward_threshold=1000
     )
 
-from objects import Robot, NeuralRobot
+from objects import Robot, NeuralRobot, SarsaRobot
 
 
 class MyRobot(Robot):

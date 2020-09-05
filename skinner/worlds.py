@@ -129,6 +129,7 @@ class GridMaze(GridWorld):
     Extends:
         GridWorld
     """
+
     __walls = set()
 
     def add_walls(self, walls):
@@ -138,7 +139,6 @@ class GridMaze(GridWorld):
         r, c = m.shape
         walls = set((i, j) for i in range(1, r+1) for j in range(1, c+1) if m[i, j])
         self.add_walls(walls)
-                    
 
     @property
     def walls(self):
@@ -181,4 +181,9 @@ class GridMaze(GridWorld):
                 if k != 'walls':
                     setattr(self, k, v)
                 else:
-                    self.add_walls(v)
+                    if isinstance(v, set):
+                        self.add_walls(v)
+                    elif isinstance(v, np.ndarray):
+                        self.add_wall_matrix(v)
+                    else:
+                        raise TypeError(f'{v} is not a set or a numpy.ndarray!')

@@ -6,7 +6,7 @@ import gym
 
 gym.register(
     id='GridWorld-v1',
-    entry_point='simple_grid:MyGridWorld2',
+    entry_point='simple_grid:MyGridWorld3',
     max_episode_steps=200,
     reward_threshold=1000
     )
