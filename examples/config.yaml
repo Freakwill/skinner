@@ -5,25 +5,92 @@
 
 
 ## number of grids
-n_cols: 7
-n_rows: 7
+n_cols: 20
+n_rows: 20
 ## size of every grid
-edge: 80
+edge: 30
 
 
 ## positions of walls
 walls: !!set
   {
-  !!python/tuple [2, 6],
-  !!python/tuple [3, 6],
+  !!python/tuple [4, 20],
+  !!python/tuple [4, 19],
+  !!python/tuple [4, 18],
+  !!python/tuple [4, 17],
+  !!python/tuple [4, 16],
+  !!python/tuple [4, 15],
+  !!python/tuple [3, 14],
+  !!python/tuple [1, 14],
+  !!python/tuple [1, 9], 
+  !!python/tuple [2, 9],
+  !!python/tuple [3, 9],
+  !!python/tuple [4, 9],
+  !!python/tuple [5, 9],
+  !!python/tuple [6, 9],
+  !!python/tuple [7, 9],
+  !!python/tuple [8, 9],
+  !!python/tuple [9, 10],
+  !!python/tuple [10, 11],
+  !!python/tuple [10, 12],
+  !!python/tuple [10, 13],
+  !!python/tuple [10, 14],
+  !!python/tuple [10, 15],
+  !!python/tuple [11, 14],
+  !!python/tuple [12, 14],
+  !!python/tuple [13, 14],
+  !!python/tuple [14, 14],
+  !!python/tuple [15, 14],
+  !!python/tuple [16, 14],
+  !!python/tuple [17, 14],
+  !!python/tuple [7, 13],
+  !!python/tuple [7, 14],
+  !!python/tuple [7, 15],
+  !!python/tuple [7, 16],
+  !!python/tuple [7, 17],
+  !!python/tuple [7, 18],
+  !!python/tuple [8, 17],
+  !!python/tuple [9, 17],
+  !!python/tuple [10, 17],
+  !!python/tuple [11, 17],
+  !!python/tuple [12, 17],
+  !!python/tuple [13, 17],
+  !!python/tuple [14, 17],
+  !!python/tuple [15, 18],
+  !!python/tuple [15, 20],
+  !!python/tuple [15, 8],
+  !!python/tuple [16, 8],
+  !!python/tuple [17, 9],
+  !!python/tuple [19, 10],
+  !!python/tuple [20, 10],
+  !!python/tuple [15, 7],
+  !!python/tuple [14, 6],
+  !!python/tuple [13, 6],
+  !!python/tuple [12, 6],
+  !!python/tuple [11, 6],
+  !!python/tuple [10, 6],
+  !!python/tuple [9, 6],
+  !!python/tuple [5, 8],
+  !!python/tuple [5, 7],
   !!python/tuple [5, 6],
-  !!python/tuple [5, 7], 
-  !!python/tuple [2, 4],
-  !!python/tuple [4, 4],
+  !!python/tuple [5, 5],
+  !!python/tuple [5, 4],
+  !!python/tuple [5, 3],
   !!python/tuple [6, 3],
-  !!python/tuple [6, 4],
-  !!python/tuple [5, 2],
-  !!python/tuple [4, 2]}
+  !!python/tuple [7, 3],
+  !!python/tuple [8, 3],
+  !!python/tuple [9, 3],
+  !!python/tuple [10, 3],
+  !!python/tuple [11, 3],
+  !!python/tuple [12, 3],
+  !!python/tuple [13, 3],
+  !!python/tuple [3, 2],
+  !!python/tuple [3, 3],
+  !!python/tuple [2, 4],
+  !!python/tuple [13, 10],
+  !!python/tuple [14, 10],
+  !!python/tuple [15, 10],
+}
 
 
 ## objects in environment (excluding the agent)
@@ -36,11 +103,23 @@ traps: !!python/object:objects.ObjectGroup
       color: [1,0.5,0]
       proportion: 0.4
     - !!python/object:objects.Trap
-      position: !!python/tuple [1, 3]
+      position: !!python/tuple [1, 7]
       color: [1,0.5,0]
       proportion: 0.4
     - !!python/object:objects.Trap
-      position: !!python/tuple [7, 1]
+      position: !!python/tuple [7, 2]
+      color: [1,0.5,0]
+      proportion: 0.4
+    - !!python/object:objects.Trap
+      position: !!python/tuple [11, 8]
+      color: [1,0.5,0]
+      proportion: 0.4
+    - !!python/object:objects.Trap
+      position: !!python/tuple [3, 1]
+      color: [1,0.5,0]
+      proportion: 0.4
+    - !!python/object:objects.Trap
+      position: !!python/tuple [9, 11]
       color: [1,0.5,0]
       proportion: 0.4
 
@@ -49,12 +128,16 @@ deathtraps: !!python/object:objects.ObjectGroup
   name: 'deathtraps'
   members:
     - !!python/object:objects.DeathTrap
-      position: !!python/tuple [6, 5]
+      position: !!python/tuple [15, 19]
       color: [.8,0,0.5]
       proportion: 0.45
 
     - !!python/object:objects.DeathTrap
-      position: !!python/tuple [2, 1]
+      position: !!python/tuple [18, 10]
+      color: [.8,0,0.5]
+      proportion: 0.45
+    - !!python/object:objects.DeathTrap
+      position: !!python/tuple [19, 6]
       color: [.8,0,0.5]
       proportion: 0.45
 
@@ -63,7 +146,7 @@ deathtraps: !!python/object:objects.ObjectGroup
 gold: !!python/object:objects.Gold
   name: 'gold'
   position: !!python/tuple
-    [7, 7]
+    [1, 2]
   color: [1,0.8,0]
   proportion: 0.4
 

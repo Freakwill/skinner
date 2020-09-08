@@ -1,0 +1,69 @@
+# Grid Maze: 
+# n_cols * n_rows: size of the maze, the number of squares
+# edge: the length of the edge of each square
+# walls: the positions of walls as the components of the environment
+
+
+## number of grids
+n_cols: 7
+n_rows: 7
+## size of every grid
+edge: 80
+
+
+## positions of walls
+walls: !!set
+  {
+  !!python/tuple [2, 6],
+  !!python/tuple [3, 6],
+  !!python/tuple [5, 6],
+  !!python/tuple [5, 7], 
+  !!python/tuple [2, 4],
+  !!python/tuple [4, 4],
+  !!python/tuple [6, 3],
+  !!python/tuple [6, 4],
+  !!python/tuple [5, 2],
+  !!python/tuple [4, 2]}
+
+
+## objects in environment (excluding the agent)
+## traps, not terminal
+traps: !!python/object:objects.ObjectGroup
+  name: 'traps'
+  members:
+    - !!python/object:objects.Trap
+      position: !!python/tuple [3, 5]
+      color: [1,0.5,0]
+      proportion: 0.4
+    - !!python/object:objects.Trap
+      position: !!python/tuple [1, 3]
+      color: [1,0.5,0]
+      proportion: 0.4
+    - !!python/object:objects.Trap
+      position: !!python/tuple [7, 1]
+      color: [1,0.5,0]
+      proportion: 0.4
+
+## deathtraps, terminal
+deathtraps: !!python/object:objects.ObjectGroup
+  name: 'deathtraps'
+  members:
+    - !!python/object:objects.DeathTrap
+      position: !!python/tuple [6, 5]
+      color: [.8,0,0.5]
+      proportion: 0.45
+
+    - !!python/object:objects.DeathTrap
+      position: !!python/tuple [2, 1]
+      color: [.8,0,0.5]
+      proportion: 0.45
+
+
+## gold, terminal
+gold: !!python/object:objects.Gold
+  name: 'gold'
+  position: !!python/tuple
+    [7, 7]
+  color: [1,0.8,0]
+  proportion: 0.4
+

@@ -7,7 +7,7 @@ import gym
 gym.register(
     id='GridWorld-v1',
     entry_point='simple_grid:MyGridWorld',
-    max_episode_steps=200,
+    max_episode_steps=500,
     reward_threshold=1000
     )
 
@@ -84,4 +84,4 @@ if __name__ == '__main__':
     env.config('config.yaml')
     env.add_agent(agent)
     env.seed()
-    env.demo(n_epochs=200)
+    env.demo(n_epochs=200, n_steps=300)
