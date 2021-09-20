@@ -26,6 +26,8 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
         metadata {dict} -- configuration of rendering
     """
 
+    max_steps = 300
+
     def is_terminal(self):
         return self.agent.position in self.DEATHTRAPS or self.agent.position == self.GOLD
 

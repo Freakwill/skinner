@@ -141,6 +141,8 @@ walls: !!set
 
 
 ## objects in environment (excluding the agent)
+## the significant attrs of objects are position color and size, the size will be calculated
+## automatically according to proportion (size = proportion * edge)
 ## traps, not terminal
 traps: !!python/object:objects.ObjectGroup
   name: 'traps'
@@ -148,15 +150,15 @@ traps: !!python/object:objects.ObjectGroup
     - !!python/object:objects.Trap
       position: !!python/tuple [3, 5]
       color: [1,0.5,0]
-      size: 30
+
     - !!python/object:objects.Trap
       position: !!python/tuple [1, 3]
       color: [1,0.5,0]
-      size: 30
+
     - !!python/object:objects.Trap
       position: !!python/tuple [7, 1]
       color: [1,0.5,0]
-      size: 30
+
 
 ## deathtraps, terminal
 deathtraps: !!python/object:objects.ObjectGroup
@@ -165,12 +167,10 @@ deathtraps: !!python/object:objects.ObjectGroup
     - !!python/object:objects.DeathTrap
       position: !!python/tuple [6, 5]
       color: [.8,0,0.5]
-      size: 35
 
     - !!python/object:objects.DeathTrap
       position: !!python/tuple [2, 1]
       color: [.8,0,0.5]
-      size: 35
 
 ## gold, terminal
 gold: !!python/object:objects.Gold
@@ -178,7 +178,6 @@ gold: !!python/object:objects.Gold
   position: !!python/tuple
     [7, 7]
   color: [1,0.8,0]
-  size: 30
 ```
 
 

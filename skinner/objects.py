@@ -4,6 +4,11 @@
 from gym.envs.classic_control import rendering
 
 class BaseObject:
+    """Base class of all so-called Object class
+
+    Define props to set the significant attributes of Object class
+    An example is `Object` class
+    """
     __env = None
     state = None
 
@@ -66,6 +71,7 @@ class Object(BaseObject):
         pass
 
     def create_shape(self):
+        # circle shape by defualt
         self.shape = rendering.make_circle(self.size)
         self.shape.set_color(*self.color)
 
@@ -79,9 +85,9 @@ class Object(BaseObject):
     @property
     def coordinate(self):
         """
-        If an object has no absolute coordinate and is plotted with a relative position
-        according to the env.
-        One should define a method translating position to coordinate.
+        If an object has no absolute coordinate and would be plotted with a relative position
+        according to the env, then one should define a method translating position to coordinate.
+        
         It is recommanded to define the method dynamically in envs, for example,
 
         import types
@@ -95,6 +101,7 @@ class Object(BaseObject):
 
 
 class ObjectGroup(BaseObject):
+    # a set of `Object` object
     props = ('name', 'members')
     default_name = ''
 

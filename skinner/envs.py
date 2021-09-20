@@ -13,7 +13,7 @@ class BaseEnv(gym.Env):
     }
 
     history = None
-    max_steps = 100
+    max_steps = 200
     viewer = None
 
     def __init__(self, objects={}):
@@ -46,7 +46,7 @@ class BaseEnv(gym.Env):
             # draw the objects in env
             self.draw_objects()
 
-        return self.viewer.render(return_rgb_array=mode == 'rgb_array')
+        return self.viewer.render(return_rgb_array=mode=='rgb_array')
 
     def post_process(self, *args, **kwargs):
         pass
@@ -57,19 +57,19 @@ class BaseEnv(gym.Env):
     def end_process(self):
         import pandas as pd
         if isinstance(self.history, pd.DataFrame):
-            self.history.to_csv('history.csv')
+            self.history.to_csv(f'history.csv')
 
-    def demo(self, n_epochs=200, n_steps=1000, history=None):
+    def demo(self, n_epochs=200, n_steps=None, history=None):
         import time
-        # demo of RL
-        n_steps = min(n_steps, self.max_steps)
+        if n_steps is None:
+            n_steps = self.max_steps
         self.pre_process()
         for i in range(n_epochs):
             self.reset()
             self.render()
             self.epoch = i
             for k in range(n_steps):
-                time.sleep(.00001)
+                time.sleep(0)
                 self.step()
                 self.render()
                 done = self.is_terminal()
@@ -122,5 +122,9 @@ class SingleAgentEnv(BaseEnv):
 
     def post_process(self):
         self.agent.post_process()
+
+    def end_process(self):
+        if hasattr(self.history, 'to_csv'):
+            self.history.to_csv(f'history-{self.agent.name}.csv')
 
     

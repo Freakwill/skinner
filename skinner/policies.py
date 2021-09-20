@@ -63,7 +63,8 @@ def ez_proba_i(Q, si, i, action_space, states=None, temperature=1):
 def predict_proba(Q, s, action_space, states=None, temperature=1, pa=None, ps=None):
     # pa: priori proba of actions
     P = np.array([joint_proba_i(Q, si, i, action_space, states=states, temperature=temperature, ps=ps) for i, si in enumerate(s)])
-    pa_s = temperature * np.sum(np.log(P), axis=0) + (1-len(s)) * np.log([pa[a] for a in action_space])
+    pa_s = np.sum(np.log(P), axis=0) + (1-len(s)) * np.log([pa[a] for a in action_space])
+    pa_s = np.exp(pa_s)
     return pa_s / np.sum(pa_s)
 
 def predict(Q, s, states=None, temperature=1, pa=None):
@@ -95,17 +96,16 @@ def bayes(state, action_space, Q, temperature=1, epsilon=0.01, pa=None, ps=None)
     if not [s for s, a in Q.keys() if s==state] and pa and ps:
         return generate(Q, state, action_space, states=None, temperature=temperature, pa=pa, ps=ps)
     else:
-        qs = np.array([Q.get((state, a),0) for a in action_space])
+        q = np.array([Q.get((state, a),0) for a in action_space])
+        p = softmax(q / temperature)
+        unknown = [(i, a) for i, a in enumerate(action_space) if (state, a) not in Q]
+        if len(unknown)>=2:
+            pp = predict_proba(Q, state, action_space, states=None, temperature=1, pa=pa, ps=ps)
+            r = np.sum([p[i] for i, a in unknown]) / np.sum([pp[i] for i, a in unknown])
+            for i, a in unknown:
+                p[i] = pp[i] * r
         if random() < epsilon:
-            p = softmax(qs / temperature)
-            if len([a for a in action_space if (state, a) not in Q])>1:
-                q = predict_proba(Q, state, action_space, states=None, temperature=1, pa=pa, ps=ps)
-                r = np.sum([p[i] for i, a in enumerate(action_space) if (state, a) not in Q]) / np.sum([q[i] for i, a in enumerate(action_space) if (state, a) not in Q])
-                for i, a in enumerate(action_space):
-                    if (state, a) not in Q:
-                        p[i]=q[i] * r
-            d = rv_discrete(values=(np.arange(len(qs)), p))
+            d = rv_discrete(values=(np.arange(action_space.n), p))
             return action_space[d.rvs()]
-
-        k = np.argmax(qs)
+        k = np.argmax(p)
         return action_space[k]

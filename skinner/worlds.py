@@ -4,6 +4,10 @@
 from .envs import *
 from .objects import *
 
+
+def _coordinate(position, edge=10, offset=0.5):
+    return (position[0]+0.5-offset)*edge, (position[1]+0.5-offset)*edge
+
 class GridWorld(BaseEnv):
     """Grid world
     
@@ -23,7 +27,7 @@ class GridWorld(BaseEnv):
         return (k[0]+offset)*self.edge, (k[1]+offset)*self.edge
 
     def add_objects(self, objs):
-        super(GridWorld, self).add_objects(objs)
+        super().add_objects(objs)
         import types
         def _coordinate(o):
             return self.coordinate(o.position)
@@ -36,7 +40,7 @@ class GridWorld(BaseEnv):
 
 
     def coordinate(self, position, offset=None):
-        """Transform a position to a coordinate
+        """Translate a position to a coordinate
         
         Arguments:
             position {tuple} -- the position of an object in the grid world
@@ -50,7 +54,7 @@ class GridWorld(BaseEnv):
 
         if offset is None:
             offset = self.offset
-        return (position[0] - 0.5 +offset)*self.edge, (position[1]-0.5+offset)*self.edge
+        return _coordinate(position, edge=self.edge, offset=offset)
 
 
     def draw_background(self):
@@ -75,6 +79,7 @@ class GridWorld(BaseEnv):
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
     def collide(self, x):
+        # collision check
         return not (1<=x[0]<=self.n_cols and 1<=x[1]<=self.n_rows)
 
     def config(self, conf):
@@ -99,10 +104,6 @@ class GridWorld(BaseEnv):
                 setattr(self, k, v)
 
 
-def _coordinate(position, edge=10, offset=0.5):
-    return (position[0]+0.5-offset)*edge, (position[1]+0.5-offset)*edge
-
-
 class Wall(Object):
     '''Wall Class
     Black rectangles in the env
@@ -111,7 +112,7 @@ class Wall(Object):
 
     props = ('name', 'position', 'color', 'size')
     default_color = (0.2, 0.2, 0.2)
-    default_position=(0, 0)
+    default_position = (0, 0)
 
     @property
     def coordinate(self):

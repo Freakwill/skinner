@@ -84,12 +84,18 @@ walls: !!set
   !!python/tuple [11, 3],
   !!python/tuple [12, 3],
   !!python/tuple [13, 3],
+  !!python/tuple [14, 3],
+  !!python/tuple [15, 3],
+  !!python/tuple [17, 4],
+  !!python/tuple [16, 4],
   !!python/tuple [3, 2],
   !!python/tuple [3, 3],
   !!python/tuple [2, 4],
   !!python/tuple [13, 10],
   !!python/tuple [14, 10],
   !!python/tuple [15, 10],
+  !!python/tuple [18, 15],
+  !!python/tuple [18, 16]
 }
 
 
@@ -120,6 +126,18 @@ traps: !!python/object:objects.ObjectGroup
       proportion: 0.4
     - !!python/object:objects.Trap
       position: !!python/tuple [9, 11]
+      color: [1,0.5,0]
+      proportion: 0.4
+    - !!python/object:objects.Trap
+      position: !!python/tuple [2, 11]
+      color: [1,0.5,0]
+      proportion: 0.4
+    - !!python/object:objects.Trap
+      position: !!python/tuple [3, 11]
+      color: [1,0.5,0]
+      proportion: 0.4
+    - !!python/object:objects.Trap
+      position: !!python/tuple [18, 2]
       color: [1,0.5,0]
       proportion: 0.4
 

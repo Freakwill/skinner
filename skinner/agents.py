@@ -5,20 +5,19 @@ from .policies import *
 from .objects import *
 
 class BaseAgent(Object):
-    '''[Summary for Class BaseAgent]BaseAgent has 4 (principal) propteries
-    QTable: QTable
-    state: state
+    '''
+    QTable: Q Table
+    state: state of agent
     last_state: last state
-    init_state: init state'''
+    init_state: init. state
+    '''
 
     env = None
     n_steps = 0
     total_reward = 0
 
     def next_state(self, action):
-        """
-        self.__next_state: state transition method
-        function: state, action -> state
+        """state transition method
         """
         self.n_steps +=1
         self.last_state = self.state
@@ -26,7 +25,7 @@ class BaseAgent(Object):
 
     def get_reward(self, action):
         r = self._get_reward(self.last_state, action, self.state)
-        self.total_reward += r
+        self.total_reward = self.total_reward * self.gamma + r
         return r
 
     def Q(self, key):
@@ -69,8 +68,9 @@ class BaseAgent(Object):
 
     def save(self, fname=None):
         import pickle, pathlib
+        name = fname or self.name
         if self.name:
-            pklPath = pathlib.Path(f'{self.name}.pkl')
+            pklPath = pathlib.Path(f'{name}.pkl')
         else:
             pklPath = pathlib.Path('agent.pkl')
         with open(pklPath, 'wb') as fo:
@@ -257,7 +257,7 @@ class BoltzmannAgent(StandardAgent):
     def post_process(self, *args, **kwargs):
         # post process after a single step
         super(BoltzmannAgent, self).post_process(*args, **kwargs)
-        self.temperature *= 0.99
+        self.temperature *= 0.95
 
 
 import pandas as pd
@@ -265,6 +265,7 @@ from sklearn.neural_network import *
 
 
 class MLAgent(StandardAgent):
+    # It dose not work well!
 
     flag = True
 
@@ -280,10 +281,11 @@ class MLAgent(StandardAgent):
         self.alpha = 0.1
         self.epsilon = 0.2
         self.cache = pd.DataFrame(columns=('state', 'action', 'reward', 'state+'))
-        self.max_cache = 500
+        self.max_cache = 1000
 
     @classmethod
     def key2vector(cls, key):
+        # (state, action) -> vector
         return *key[0], key[1]
 
     def Q(self, key):
@@ -303,11 +305,13 @@ class MLAgent(StandardAgent):
 
 
     def V(self, state):
+        # V-function wrt Q
         if self.env.is_terminal():
             return 0
         return max([self.Q(key=(state, a)) for a in self.action_space])
 
     def V_(self, state):
+        # V-function wrt Q_
         if self.env.is_terminal():
             return 0
         return max([self.Q_(key=(state, a)) for a in self.action_space])
@@ -318,9 +322,9 @@ class MLAgent(StandardAgent):
         if L > self.max_cache:
             self.cache.drop(np.arange(L-self.max_cache+10))
         if L > 100:
-            if self.n_steps % 5 == 4:
+            if self.n_steps % 10 == 9:
                 self.learn()
-            if self.n_steps % 30 == 29:
+            if self.n_steps % 50 == 49:
                 self.updateQ()
 
     def get_samples(self, size=0.1):
@@ -339,6 +343,7 @@ class MLAgent(StandardAgent):
 
     def learn(self):
         X, y = self.get_samples()
+        print(X, y)
         self.mainQ.fit(X, y)
         if self.flag:
             self.targetQ.fit(X,y)
@@ -348,8 +353,8 @@ class MLAgent(StandardAgent):
 class NeuralAgent(MLAgent):
     def __init__(self, *args, **kwargs):
         super(NeuralAgent, self).__init__(*args, **kwargs)
-        self.mainQ = MLPRegressor(hidden_layer_sizes=(6,), max_iter=100, warm_start=True, learning_rate='adaptive')
-        self.targetQ = MLPRegressor(max_iter=1)
+        self.mainQ = MLPRegressor(hidden_layer_sizes=(30,), max_iter=10, warm_start=True, learning_rate='adaptive')
+        self.targetQ = MLPRegressor(hidden_layer_sizes=(30,), max_iter=1)
 
     def updateQ(self):
         self.targetQ.coefs_ = self.mainQ.coefs_

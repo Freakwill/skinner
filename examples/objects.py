@@ -4,6 +4,7 @@
 from skinner import *
 
 class _Object(Object):
+    # Mixin class for objects
     props = ('name', 'position', 'color', 'proportion')
     default_position = (0, 0)
     default_proportion = 0.5

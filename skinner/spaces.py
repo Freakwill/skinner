@@ -20,7 +20,7 @@ class FiniteSet(Discrete):
     def __init__(self, actions):
         assert isinstance(actions, Iterable)
         self.__actions = tuple(actions)
-        super(FiniteSet, self).__init__(len(actions))
+        super().__init__(len(actions))
 
     @property
     def actions(self):
@@ -31,7 +31,7 @@ class FiniteSet(Discrete):
         return self.np_random.choice(self.actions)
 
     # def sample_with_proba(self, proba=None):
-    #     k = super(FiniteSet, self).sample_with_proba(proba)
+    #     k = super().sample_with_proba(proba)
     #     return self[k]
 
     def contains(self, x):
