@@ -40,41 +40,44 @@ class BaseEnv(gym.Env):
             return
 
         if self.viewer is None:  
-            self.create_viewer()
-            # draw the backgroud of the env           
+            # draw the backgroud and objects of the env 
+            self.create_viewer()       
             self.draw_background()
-            # draw the objects in env
             self.draw_objects()
 
         return self.viewer.render(return_rgb_array=mode=='rgb_array')
 
     def post_process(self, *args, **kwargs):
+        # postprocess after one train epoch
         pass
 
     def pre_process(self, *args, **kwargs):
         pass
 
+    def begin_process(self, *args, **kwargs):
+        self.pre_process(*args, **kwargs)
+
     def end_process(self):
-        import pandas as pd
-        if isinstance(self.history, pd.DataFrame):
+        # postprocess after all train epochs
+        if hasattr(self.history, 'to_csv'):
             self.history.to_csv(f'history.csv')
 
     def demo(self, n_epochs=200, n_steps=None, history=None):
+        # business process of RL
         import time
         if n_steps is None:
             n_steps = self.max_steps
-        self.pre_process()
+        self.begin_process()
         for i in range(n_epochs):
             self.reset()
             self.render()
             self.epoch = i
             for k in range(n_steps):
+                if self.is_terminal():
+                    break
                 time.sleep(0)
                 self.step()
                 self.render()
-                done = self.is_terminal()
-                if done:
-                    break
             self.post_process()
         self.end_process()
         self.close()
@@ -88,10 +91,12 @@ class BaseEnv(gym.Env):
             obj.reset()
 
     def step(self):
-        is_terminal = self.is_terminal()
-        if not is_terminal:
-            for _, obj in self.objects.items():
-                obj.step()
+        """A single step of the change of the whole environment;
+        It is the core code of RL;
+        It will call step methods of its objects iteratively
+        """
+        for _, obj in self.objects.items():
+            obj.step()
 
 class MultiAgentEnv(BaseEnv):
     pass

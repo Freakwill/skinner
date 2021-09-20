@@ -99,7 +99,7 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
         self.history['reward'].append(self.agent.total_reward)
         self.agent.post_process()
 
-    def pre_process(self):
+    def begin_process(self):
         self.history['n_steps'] = []
         self.history['reward'] = []
 

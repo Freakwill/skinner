@@ -3,8 +3,8 @@
 
 """Demo of RL
 
-A robot playing the grid world, tries to find the gold, meanwhile
-it has to avoid of the traps
+A robot playing a grid world (object of MyGridWorld), tries to find the gold, meanwhile
+it has to avoid of the traps, surmont the barriers.
 """
 
 from skinner import *
@@ -42,7 +42,7 @@ class MyGridWorld(GridMaze, SingleAgentEnv):
         self.history = self.history.append({'n_steps': n, 'total rewards':self.agent.total_reward}, ignore_index=True)
         self.agent.post_process()
 
-    def pre_process(self):
+    def begin_process(self):
         import pandas as pd
         self.history = pd.DataFrame(columns=('n_steps', 'total rewards'))
 
@@ -60,7 +60,7 @@ class MyGridWorld2(MyGridWorld):
         self.agent.position == self.DEATHTRAP3 or self.agent.position == self.GOLD)
 
     def render(self, mode='human', close=False):
-        super(MyGridWorld2, self).render(mode, close)
+        super().render(mode, close)
         if self.agent.flag1:
             self.objects['deathtrap1'].shape.set_color(0, 0.8, 0)
         if self.agent.flag2:
@@ -78,7 +78,7 @@ class MyGridWorld3(MyGridWorld):
         self.agent.position == self.GOLD)
 
     def render(self, mode='human', close=False):
-        super(MyGridWorld3, self).render(mode, close)
+        super().render(mode, close)
         if self.agent.flag1:
             self.objects['deathtrap1'].shape.set_color(0, 0.8, 0)
         if self.agent.flag2:
@@ -86,5 +86,4 @@ class MyGridWorld3(MyGridWorld):
         if self.agent.flag3:
             self.objects['deathtrap3'].shape.set_color(0, 0.8, 0)
         return self.viewer.render(return_rgb_array=mode == 'rgb_array')
-
 

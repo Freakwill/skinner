@@ -93,6 +93,7 @@ class BaseAgent(Object):
 
 
 class StandardAgent(BaseAgent):
+    # Implement Q-learning
 
     epoch = 1
 
@@ -194,7 +195,7 @@ class StandardAgent(BaseAgent):
 
     def draw(self, viewer, flag=True):
         if flag:
-            super(StandardAgent, self).draw(viewer)
+            super().draw(viewer)
         else:
             self.transform.set_translation(*self.coordinate)
 
@@ -270,7 +271,7 @@ class MLAgent(StandardAgent):
     flag = True
 
     def __init__(self, state=None, last_state=None, init_state=None, mainQ=None, targetQ=None, *args, **kwargs):
-        super(MLAgent, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.state = state
         self.last_state = last_state
         self.init_state = init_state
@@ -352,7 +353,7 @@ class MLAgent(StandardAgent):
 
 class NeuralAgent(MLAgent):
     def __init__(self, *args, **kwargs):
-        super(NeuralAgent, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.mainQ = MLPRegressor(hidden_layer_sizes=(30,), max_iter=10, warm_start=True, learning_rate='adaptive')
         self.targetQ = MLPRegressor(hidden_layer_sizes=(30,), max_iter=1)
 
